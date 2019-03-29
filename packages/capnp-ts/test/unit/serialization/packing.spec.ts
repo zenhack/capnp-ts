@@ -17,7 +17,13 @@ import { compareBuffers, readFileBuffer } from "../../util";
 type Word = [number, number, number, number, number, number, number, number];
 type TagData = { tag: number; weight: number; word: Word }[];
 
-const TAG_DATA: TagData = [
+interface TagDataElement {
+  tag: number;
+  weight: number;
+  word: [number, number, number, number, number, number, number, number];
+}
+
+const TAG_DATA: TagDataElement[] = [
   {
     tag: 0b00000000,
     weight: 0,
