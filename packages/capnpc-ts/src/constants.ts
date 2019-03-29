@@ -55,7 +55,14 @@ export const LENGTH = ts.createIdentifier("length");
 
 /** Some data used to help generate code for primitive struct fields. */
 
-export const Primitive = {
+export const Primitive: {
+  [key: number]: {
+    byteLength: number;
+    getter: string;
+    mask: string;
+    setter: string;
+  };
+} = {
   [s.Type.BOOL]: {
     byteLength: 1,
     getter: "getBit",

@@ -280,6 +280,7 @@ const generateStructField = R.curry(
       case Type.UINT32:
       case Type.UINT64:
       case Type.UINT8:
+        // tslint:disable:strict-type-predicates
         if (typeof whichType !== "number") throw new Error("wat");
 
         const { byteLength, getter, setter } = Primitive[whichType];
@@ -490,8 +491,8 @@ const generateStructNode = R.curry(
     } = node.struct;
     const hasUnnamedUnion = discriminantCount !== 0;
     const nestedNodes = R.filter(
-      n => n.const === undefined,
-      R.map(lookupNode(ctx), node.nestedNodes || [])
+      (n: INode) => n.const === undefined,
+      R.map(lookupNode(ctx), node.nestedNodes || ([] as INode_NestedNode[]))
     );
     const concreteLists = R.filter(Field.needsConcreteListClass, fields);
     const consts = R.filter(
