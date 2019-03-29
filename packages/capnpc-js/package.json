@@ -9,7 +9,7 @@
   "dependencies": {
     "capnpc-ts": "^0.4.0",
     "debug": "^2.6.3",
-    "typescript": "^2.4.1"
+    "typescript": "^3.3.3"
   },
   "description": "Cap'n Proto schema compiler for JavaScript.",
   "devDependencies": {
