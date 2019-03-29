@@ -12,7 +12,13 @@ import {
 } from "../../../lib/serialization/packing";
 import { compareBuffers, readFileBuffer, tap } from "../../util";
 
-const TAG_DATA = [
+interface TagDataElement {
+  tag: number;
+  weight: number;
+  word: [number, number, number, number, number, number, number, number];
+}
+
+const TAG_DATA: TagDataElement[] = [
   {
     tag: 0b00000000,
     weight: 0,
