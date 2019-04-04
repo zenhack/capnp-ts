@@ -90,11 +90,11 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
     )
   );
 
-  // import { ObjectSize as __O, Struct as __S } from '${importPath}';
+  // import { ObjectSize as __O, Struct as __S, Interface as __I } from '${importPath}';
   ctx.statements.push(
     ts.createStatement(
       ts.createIdentifier(
-        `import { ObjectSize as __O, Struct as __S } from '${importPath}'`
+        `import { ObjectSize as __O, Struct as __S, Interface as __I } from '${importPath}'`
       )
     )
   );
@@ -1045,7 +1045,7 @@ export function generateStructNode(
     [EXPORT],
     fullClassName,
     __,
-    [createClassExtends("__S")],
+    [interfaceNode ? createClassExtends("__I") : createClassExtends("__S")],
     members
   );
 

@@ -240,7 +240,7 @@ export function resize(dstSize: ObjectSize, s: Struct): void {
     );
     if (isNull(srcPtr)) {
       // If source pointer is null, leave the destination pointer as default null.
-      continue
+      continue;
     }
     const srcPtrTarget = followFars(srcPtr);
     const srcPtrContent = getContent(srcPtr);
