@@ -134,6 +134,7 @@ export function generateDefaultValue(field: s.Field): ts.PropertyAssignment {
     case s.Type_Which.DATA:
     case s.Type_Which.LIST:
     case s.Type_Which.STRUCT:
+    case s.Type_Which.INTERFACE:
       initializer = createValueExpression(slot.getDefaultValue());
 
       break;
