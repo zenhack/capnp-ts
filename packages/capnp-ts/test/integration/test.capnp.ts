@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "capnp-ts";
-import { ObjectSize as __O, Struct as __S } from 'capnp-ts';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from 'capnp-ts';
 export const _capnpFileId = "d508eebdc2dc42b8";
 export enum TestEnum {
     FOO,
@@ -1784,17 +1784,21 @@ export class TestGenerics_Inner2_DeepNest_DeepNestInterface_Call$Results extends
     static readonly _capnp = { displayName: "call$Results", id: "e080f0fc54614f6f", size: new __O(0, 0) };
     toString(): string { return "TestGenerics_Inner2_DeepNest_DeepNestInterface_Call$Results_" + super.toString(); }
 }
-export class TestGenerics_Inner2_DeepNest_DeepNestInterface_Client {
+export class TestGenerics_Inner2_DeepNest_DeepNestInterface$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     call(): void {
     }
 }
-export class TestGenerics_Inner2_DeepNest_DeepNestInterface_Server {
+export class TestGenerics_Inner2_DeepNest_DeepNestInterface$Server {
     call(): void {
     }
 }
-export class TestGenerics_Inner2_DeepNest_DeepNestInterface extends __S {
-    static readonly Client = TestGenerics_Inner2_DeepNest_DeepNestInterface_Client;
-    static readonly Server = TestGenerics_Inner2_DeepNest_DeepNestInterface_Server;
+export class TestGenerics_Inner2_DeepNest_DeepNestInterface extends __I {
+    static readonly Client = TestGenerics_Inner2_DeepNest_DeepNestInterface$Client;
+    static readonly Server = TestGenerics_Inner2_DeepNest_DeepNestInterface$Server;
     static readonly _capnp = { displayName: "DeepNestInterface", id: "8839ed86c9794287", size: new __O(0, 0) };
     toString(): string { return "TestGenerics_Inner2_DeepNest_DeepNestInterface_" + super.toString(); }
 }
@@ -1865,17 +1869,21 @@ export class TestGenerics_Interface_Call$Results extends __S {
     setGen(value: TestGenerics): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestGenerics_Interface_Call$Results_" + super.toString(); }
 }
-export class TestGenerics_Interface_Client {
+export class TestGenerics_Interface$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     call(): void {
     }
 }
-export class TestGenerics_Interface_Server {
+export class TestGenerics_Interface$Server {
     call(): void {
     }
 }
-export class TestGenerics_Interface extends __S {
-    static readonly Client = TestGenerics_Interface_Client;
-    static readonly Server = TestGenerics_Interface_Server;
+export class TestGenerics_Interface extends __I {
+    static readonly Client = TestGenerics_Interface$Client;
+    static readonly Server = TestGenerics_Interface$Server;
     static readonly _capnp = { displayName: "Interface", id: "c9e749e8dd54da5c", size: new __O(0, 0) };
     toString(): string { return "TestGenerics_Interface_" + super.toString(); }
 }
@@ -1995,17 +2003,21 @@ export class TestImplicitMethodParams_Call$Params extends __S {
     setBar(value: capnp.Pointer): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestImplicitMethodParams_Call$Params_" + super.toString(); }
 }
-export class TestImplicitMethodParams_Client {
+export class TestImplicitMethodParams$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     call(): void {
     }
 }
-export class TestImplicitMethodParams_Server {
+export class TestImplicitMethodParams$Server {
     call(): void {
     }
 }
-export class TestImplicitMethodParams extends __S {
-    static readonly Client = TestImplicitMethodParams_Client;
-    static readonly Server = TestImplicitMethodParams_Server;
+export class TestImplicitMethodParams extends __I {
+    static readonly Client = TestImplicitMethodParams$Client;
+    static readonly Server = TestImplicitMethodParams$Server;
     static readonly _capnp = { displayName: "TestImplicitMethodParams", id: "8b9717a3f8d85a9a", size: new __O(0, 0) };
     toString(): string { return "TestImplicitMethodParams_" + super.toString(); }
 }
@@ -2023,17 +2035,21 @@ export class TestImplicitMethodParamsInGeneric_Call$Params extends __S {
     setBar(value: capnp.Pointer): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestImplicitMethodParamsInGeneric_Call$Params_" + super.toString(); }
 }
-export class TestImplicitMethodParamsInGeneric_Client {
+export class TestImplicitMethodParamsInGeneric$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     call(): void {
     }
 }
-export class TestImplicitMethodParamsInGeneric_Server {
+export class TestImplicitMethodParamsInGeneric$Server {
     call(): void {
     }
 }
-export class TestImplicitMethodParamsInGeneric extends __S {
-    static readonly Client = TestImplicitMethodParamsInGeneric_Client;
-    static readonly Server = TestImplicitMethodParamsInGeneric_Server;
+export class TestImplicitMethodParamsInGeneric extends __I {
+    static readonly Client = TestImplicitMethodParamsInGeneric$Client;
+    static readonly Server = TestImplicitMethodParamsInGeneric$Server;
     static readonly _capnp = { displayName: "TestImplicitMethodParamsInGeneric", id: "df9ccdeb81a704c9", size: new __O(0, 0) };
     toString(): string { return "TestImplicitMethodParamsInGeneric_" + super.toString(); }
 }
@@ -2122,8 +2138,8 @@ export class TestUseGenerics extends __S {
     hasCap(): boolean { return !__S.isNull(__S.getPointer(18, this)); }
     initCap(): TestGenerics { return __S.initStructAt(18, TestGenerics, this); }
     setCap(value: TestGenerics): void { __S.copyFrom(value, __S.getPointer(18, this)); }
-    getGenericCap(): capnp.Interface { return __S.getPointerAs(19, capnp.Interface, this); }
-    setGenericCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(19, this)); }
+    getGenericCap(): TestGenerics_Interface { return __S.getPointerAs(19, TestGenerics_Interface, this); }
+    setGenericCap(value: TestGenerics_Interface): void { __S.copyFrom(value, __S.getPointer(19, this)); }
     adoptDefault(value: capnp.Orphan<TestGenerics>): void { __S.adopt(value, __S.getPointer(5, this)); }
     disownDefault(): capnp.Orphan<TestGenerics> { return __S.disown(this.getDefault()); }
     getDefault(): TestGenerics { return __S.getStruct(5, TestGenerics, this, TestUseGenerics._capnp.defaultDefault); }
@@ -2294,7 +2310,11 @@ export class TestInterface_Baz$Results extends __S {
     static readonly _capnp = { displayName: "baz$Results", id: "9b99d14f2f375b2d", size: new __O(0, 0) };
     toString(): string { return "TestInterface_Baz$Results_" + super.toString(); }
 }
-export class TestInterface_Client {
+export class TestInterface$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     foo(): void {
     }
     bar(): void {
@@ -2302,7 +2322,7 @@ export class TestInterface_Client {
     baz(): void {
     }
 }
-export class TestInterface_Server {
+export class TestInterface$Server {
     foo(): void {
     }
     bar(): void {
@@ -2310,9 +2330,9 @@ export class TestInterface_Server {
     baz(): void {
     }
 }
-export class TestInterface extends __S {
-    static readonly Client = TestInterface_Client;
-    static readonly Server = TestInterface_Server;
+export class TestInterface extends __I {
+    static readonly Client = TestInterface$Client;
+    static readonly Server = TestInterface$Server;
     static readonly _capnp = { displayName: "TestInterface", id: "88eb12a0e0af92b2", size: new __O(0, 0) };
     toString(): string { return "TestInterface_" + super.toString(); }
 }
@@ -2332,7 +2352,11 @@ export class TestExtends_Grault$Params extends __S {
     static readonly _capnp = { displayName: "grault$Params", id: "f3b834e851ea8af6", size: new __O(0, 0) };
     toString(): string { return "TestExtends_Grault$Params_" + super.toString(); }
 }
-export class TestExtends_Client {
+export class TestExtends$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     qux(): void {
     }
     corge(): void {
@@ -2340,7 +2364,7 @@ export class TestExtends_Client {
     grault(): void {
     }
 }
-export class TestExtends_Server {
+export class TestExtends$Server {
     qux(): void {
     }
     corge(): void {
@@ -2348,26 +2372,30 @@ export class TestExtends_Server {
     grault(): void {
     }
 }
-export class TestExtends extends __S {
-    static readonly Client = TestExtends_Client;
-    static readonly Server = TestExtends_Server;
+export class TestExtends extends __I {
+    static readonly Client = TestExtends$Client;
+    static readonly Server = TestExtends$Server;
     static readonly _capnp = { displayName: "TestExtends", id: "e4e9bac98670b748", size: new __O(0, 0) };
     toString(): string { return "TestExtends_" + super.toString(); }
 }
-export class TestExtends2_Client {
+export class TestExtends2$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
 }
-export class TestExtends2_Server {
+export class TestExtends2$Server {
 }
-export class TestExtends2 extends __S {
-    static readonly Client = TestExtends2_Client;
-    static readonly Server = TestExtends2_Server;
+export class TestExtends2 extends __I {
+    static readonly Client = TestExtends2$Client;
+    static readonly Server = TestExtends2$Server;
     static readonly _capnp = { displayName: "TestExtends2", id: "98d7e0ef61488783", size: new __O(0, 0) };
     toString(): string { return "TestExtends2_" + super.toString(); }
 }
 export class TestPipeline_Box extends __S {
     static readonly _capnp = { displayName: "Box", id: "b0b29e51db0e26b1", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestPipeline_Box_" + super.toString(); }
 }
 export class TestPipeline_AnyBox extends __S {
@@ -2383,8 +2411,8 @@ export class TestPipeline_GetCap$Params extends __S {
     static readonly _capnp = { displayName: "getCap$Params", id: "c7e8df5096257034", size: new __O(8, 1) };
     getN(): number { return __S.getUint32(0, this); }
     setN(value: number): void { __S.setUint32(0, value, this); }
-    getInCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setInCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getInCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setInCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestPipeline_GetCap$Params_" + super.toString(); }
 }
 export class TestPipeline_GetCap$Results extends __S {
@@ -2401,19 +2429,19 @@ export class TestPipeline_GetCap$Results extends __S {
 }
 export class TestPipeline_TestPointers$Params extends __S {
     static readonly _capnp = { displayName: "testPointers$Params", id: "a604ee63cf37819f", size: new __O(0, 3) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     adoptObj(value: capnp.Orphan<capnp.Pointer>): void { __S.adopt(value, __S.getPointer(1, this)); }
     disownObj(): capnp.Orphan<capnp.Pointer> { return __S.disown(this.getObj()); }
     getObj(): capnp.Pointer { return __S.getPointer(1, this); }
     hasObj(): boolean { return !__S.isNull(__S.getPointer(1, this)); }
     setObj(value: capnp.Pointer): void { __S.copyFrom(value, __S.getPointer(1, this)); }
-    adoptList(value: capnp.Orphan<capnp.List<capnp.Interface>>): void { __S.adopt(value, __S.getPointer(2, this)); }
-    disownList(): capnp.Orphan<capnp.List<capnp.Interface>> { return __S.disown(this.getList()); }
-    getList(): capnp.List<capnp.Interface> { return __S.getList(2, capnp.InterfaceList, this); }
+    adoptList(value: capnp.Orphan<capnp.List<TestInterface>>): void { __S.adopt(value, __S.getPointer(2, this)); }
+    disownList(): capnp.Orphan<capnp.List<TestInterface>> { return __S.disown(this.getList()); }
+    getList(): capnp.List<TestInterface> { return __S.getList(2, capnp.InterfaceList, this); }
     hasList(): boolean { return !__S.isNull(__S.getPointer(2, this)); }
-    initList(length: number): capnp.List<capnp.Interface> { return __S.initList(2, capnp.InterfaceList, length, this); }
-    setList(value: capnp.List<capnp.Interface>): void { __S.copyFrom(value, __S.getPointer(2, this)); }
+    initList(length: number): capnp.List<TestInterface> { return __S.initList(2, capnp.InterfaceList, length, this); }
+    setList(value: capnp.List<TestInterface>): void { __S.copyFrom(value, __S.getPointer(2, this)); }
     toString(): string { return "TestPipeline_TestPointers$Params_" + super.toString(); }
 }
 export class TestPipeline_TestPointers$Results extends __S {
@@ -2443,7 +2471,11 @@ export class TestPipeline_GetAnyCap$Results extends __S {
     setOutBox(value: TestPipeline_AnyBox): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestPipeline_GetAnyCap$Results_" + super.toString(); }
 }
-export class TestPipeline_Client {
+export class TestPipeline$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     getCap(): void {
     }
     testPointers(): void {
@@ -2451,7 +2483,7 @@ export class TestPipeline_Client {
     getAnyCap(): void {
     }
 }
-export class TestPipeline_Server {
+export class TestPipeline$Server {
     getCap(): void {
     }
     testPointers(): void {
@@ -2459,11 +2491,11 @@ export class TestPipeline_Server {
     getAnyCap(): void {
     }
 }
-export class TestPipeline extends __S {
+export class TestPipeline extends __I {
     static readonly Box = TestPipeline_Box;
     static readonly AnyBox = TestPipeline_AnyBox;
-    static readonly Client = TestPipeline_Client;
-    static readonly Server = TestPipeline_Server;
+    static readonly Client = TestPipeline$Client;
+    static readonly Server = TestPipeline$Server;
     static readonly _capnp = { displayName: "TestPipeline", id: "a5a404caa61d4cd0", size: new __O(0, 0) };
     toString(): string { return "TestPipeline_" + super.toString(); }
 }
@@ -2479,17 +2511,21 @@ export class TestCallOrder_GetCallSequence$Results extends __S {
     setN(value: number): void { __S.setUint32(0, value, this); }
     toString(): string { return "TestCallOrder_GetCallSequence$Results_" + super.toString(); }
 }
-export class TestCallOrder_Client {
+export class TestCallOrder$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     getCallSequence(): void {
     }
 }
-export class TestCallOrder_Server {
+export class TestCallOrder$Server {
     getCallSequence(): void {
     }
 }
-export class TestCallOrder extends __S {
-    static readonly Client = TestCallOrder_Client;
-    static readonly Server = TestCallOrder_Server;
+export class TestCallOrder extends __I {
+    static readonly Client = TestCallOrder$Client;
+    static readonly Server = TestCallOrder$Server;
     static readonly _capnp = { displayName: "TestCallOrder", id: "a0e77035bdff0051", size: new __O(0, 0) };
     toString(): string { return "TestCallOrder_" + super.toString(); }
 }
@@ -2499,8 +2535,8 @@ export class TestTailCallee_TailResult extends __S {
     setI(value: number): void { __S.setUint32(0, value, this); }
     getT(): string { return __S.getText(0, this); }
     setT(value: string): void { __S.setText(0, value, this); }
-    getC(): capnp.Interface { return __S.getPointerAs(1, capnp.Interface, this); }
-    setC(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(1, this)); }
+    getC(): TestCallOrder { return __S.getPointerAs(1, TestCallOrder, this); }
+    setC(value: TestCallOrder): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestTailCallee_TailResult_" + super.toString(); }
 }
 export class TestTailCallee_Foo$Params extends __S {
@@ -2511,18 +2547,22 @@ export class TestTailCallee_Foo$Params extends __S {
     setT(value: string): void { __S.setText(0, value, this); }
     toString(): string { return "TestTailCallee_Foo$Params_" + super.toString(); }
 }
-export class TestTailCallee_Client {
+export class TestTailCallee$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     foo(): void {
     }
 }
-export class TestTailCallee_Server {
+export class TestTailCallee$Server {
     foo(): void {
     }
 }
-export class TestTailCallee extends __S {
+export class TestTailCallee extends __I {
     static readonly TailResult = TestTailCallee_TailResult;
-    static readonly Client = TestTailCallee_Client;
-    static readonly Server = TestTailCallee_Server;
+    static readonly Client = TestTailCallee$Client;
+    static readonly Server = TestTailCallee$Server;
     static readonly _capnp = { displayName: "TestTailCallee", id: "ddd699207eb8e23b", size: new __O(0, 0) };
     toString(): string { return "TestTailCallee_" + super.toString(); }
 }
@@ -2530,38 +2570,46 @@ export class TestTailCaller_Foo$Params extends __S {
     static readonly _capnp = { displayName: "foo$Params", id: "b07a279515dc8ac5", size: new __O(8, 1) };
     getI(): number { return __S.getInt32(0, this); }
     setI(value: number): void { __S.setInt32(0, value, this); }
-    getCallee(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCallee(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCallee(): TestTailCallee { return __S.getPointerAs(0, TestTailCallee, this); }
+    setCallee(value: TestTailCallee): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestTailCaller_Foo$Params_" + super.toString(); }
 }
-export class TestTailCaller_Client {
+export class TestTailCaller$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     foo(): void {
     }
 }
-export class TestTailCaller_Server {
+export class TestTailCaller$Server {
     foo(): void {
     }
 }
-export class TestTailCaller extends __S {
-    static readonly Client = TestTailCaller_Client;
-    static readonly Server = TestTailCaller_Server;
+export class TestTailCaller extends __I {
+    static readonly Client = TestTailCaller$Client;
+    static readonly Server = TestTailCaller$Server;
     static readonly _capnp = { displayName: "TestTailCaller", id: "870bf40110ce3035", size: new __O(0, 0) };
     toString(): string { return "TestTailCaller_" + super.toString(); }
 }
-export class TestHandle_Client {
+export class TestHandle$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
 }
-export class TestHandle_Server {
+export class TestHandle$Server {
 }
-export class TestHandle extends __S {
-    static readonly Client = TestHandle_Client;
-    static readonly Server = TestHandle_Server;
+export class TestHandle extends __I {
+    static readonly Client = TestHandle$Client;
+    static readonly Server = TestHandle$Server;
     static readonly _capnp = { displayName: "TestHandle", id: "a38e5efe41e53a15", size: new __O(0, 0) };
     toString(): string { return "TestHandle_" + super.toString(); }
 }
 export class TestMoreStuff_CallFoo$Params extends __S {
     static readonly _capnp = { displayName: "callFoo$Params", id: "931ba418da60f6e4", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_CallFoo$Params_" + super.toString(); }
 }
 export class TestMoreStuff_CallFoo$Results extends __S {
@@ -2572,8 +2620,8 @@ export class TestMoreStuff_CallFoo$Results extends __S {
 }
 export class TestMoreStuff_CallFooWhenResolved$Params extends __S {
     static readonly _capnp = { displayName: "callFooWhenResolved$Params", id: "fabc700c2ebe6378", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_CallFooWhenResolved$Params_" + super.toString(); }
 }
 export class TestMoreStuff_CallFooWhenResolved$Results extends __S {
@@ -2584,20 +2632,20 @@ export class TestMoreStuff_CallFooWhenResolved$Results extends __S {
 }
 export class TestMoreStuff_NeverReturn$Params extends __S {
     static readonly _capnp = { displayName: "neverReturn$Params", id: "94fe60465c95182b", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_NeverReturn$Params_" + super.toString(); }
 }
 export class TestMoreStuff_NeverReturn$Results extends __S {
     static readonly _capnp = { displayName: "neverReturn$Results", id: "def4e5fa6999c5dc", size: new __O(0, 1) };
-    getCapCopy(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCapCopy(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCapCopy(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCapCopy(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_NeverReturn$Results_" + super.toString(); }
 }
 export class TestMoreStuff_Hold$Params extends __S {
     static readonly _capnp = { displayName: "hold$Params", id: "fe7c8fbb769d8e58", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_Hold$Params_" + super.toString(); }
 }
 export class TestMoreStuff_Hold$Results extends __S {
@@ -2620,26 +2668,26 @@ export class TestMoreStuff_GetHeld$Params extends __S {
 }
 export class TestMoreStuff_GetHeld$Results extends __S {
     static readonly _capnp = { displayName: "getHeld$Results", id: "ef4e146185af67ce", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_GetHeld$Results_" + super.toString(); }
 }
 export class TestMoreStuff_Echo$Params extends __S {
     static readonly _capnp = { displayName: "echo$Params", id: "c07526f7e2e533b9", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestCallOrder { return __S.getPointerAs(0, TestCallOrder, this); }
+    setCap(value: TestCallOrder): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_Echo$Params_" + super.toString(); }
 }
 export class TestMoreStuff_Echo$Results extends __S {
     static readonly _capnp = { displayName: "echo$Results", id: "a6224536593d5b92", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestCallOrder { return __S.getPointerAs(0, TestCallOrder, this); }
+    setCap(value: TestCallOrder): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_Echo$Results_" + super.toString(); }
 }
 export class TestMoreStuff_ExpectCancel$Params extends __S {
     static readonly _capnp = { displayName: "expectCancel$Params", id: "a1cc32d87f3edeb1", size: new __O(0, 1) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(0, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_ExpectCancel$Params_" + super.toString(); }
 }
 export class TestMoreStuff_ExpectCancel$Results extends __S {
@@ -2670,8 +2718,8 @@ export class TestMoreStuff_GetHandle$Params extends __S {
 }
 export class TestMoreStuff_GetHandle$Results extends __S {
     static readonly _capnp = { displayName: "getHandle$Results", id: "c3490d75420a1fe8", size: new __O(0, 1) };
-    getHandle(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setHandle(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getHandle(): TestHandle { return __S.getPointerAs(0, TestHandle, this); }
+    setHandle(value: TestHandle): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_GetHandle$Results_" + super.toString(); }
 }
 export class TestMoreStuff_GetNull$Params extends __S {
@@ -2680,8 +2728,8 @@ export class TestMoreStuff_GetNull$Params extends __S {
 }
 export class TestMoreStuff_GetNull$Results extends __S {
     static readonly _capnp = { displayName: "getNull$Results", id: "e6955d8ef1023671", size: new __O(0, 1) };
-    getNullCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setNullCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getNullCap(): TestMoreStuff { return __S.getPointerAs(0, TestMoreStuff, this); }
+    setNullCap(value: TestMoreStuff): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMoreStuff_GetNull$Results_" + super.toString(); }
 }
 export class TestMoreStuff_GetEnormousString$Params extends __S {
@@ -2698,15 +2746,19 @@ export class TestMoreStuff_MethodWithNullDefault$Params extends __S {
     static readonly _capnp = { displayName: "methodWithNullDefault$Params", id: "fb92899aeb0ee74f", size: new __O(0, 2), defaultB: capnp.readRawPointer(new Uint8Array([0x10, 0x01, 0x00, 0x00]).buffer) };
     getA(): string { return __S.getText(0, this); }
     setA(value: string): void { __S.setText(0, value, this); }
-    getB(): capnp.Interface { return __S.getPointerAs(1, capnp.Interface, this); }
-    setB(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(1, this)); }
+    getB(): TestInterface { return __S.getPointerAs(1, TestInterface, this); }
+    setB(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestMoreStuff_MethodWithNullDefault$Params_" + super.toString(); }
 }
 export class TestMoreStuff_MethodWithNullDefault$Results extends __S {
     static readonly _capnp = { displayName: "methodWithNullDefault$Results", id: "8467348247305cf7", size: new __O(0, 0) };
     toString(): string { return "TestMoreStuff_MethodWithNullDefault$Results_" + super.toString(); }
 }
-export class TestMoreStuff_Client {
+export class TestMoreStuff$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     callFoo(): void {
     }
     callFooWhenResolved(): void {
@@ -2734,7 +2786,7 @@ export class TestMoreStuff_Client {
     methodWithNullDefault(): void {
     }
 }
-export class TestMoreStuff_Server {
+export class TestMoreStuff$Server {
     callFoo(): void {
     }
     callFooWhenResolved(): void {
@@ -2762,9 +2814,9 @@ export class TestMoreStuff_Server {
     methodWithNullDefault(): void {
     }
 }
-export class TestMoreStuff extends __S {
-    static readonly Client = TestMoreStuff_Client;
-    static readonly Server = TestMoreStuff_Server;
+export class TestMoreStuff extends __I {
+    static readonly Client = TestMoreStuff$Client;
+    static readonly Server = TestMoreStuff$Server;
     static readonly _capnp = { displayName: "TestMoreStuff", id: "ddc70bf9784133cf", size: new __O(0, 0) };
     toString(): string { return "TestMoreStuff_" + super.toString(); }
 }
@@ -2782,21 +2834,25 @@ export class TestMembrane_Thing_Intercept$Params extends __S {
     static readonly _capnp = { displayName: "intercept$Params", id: "ee94bed3615ee745", size: new __O(0, 0) };
     toString(): string { return "TestMembrane_Thing_Intercept$Params_" + super.toString(); }
 }
-export class TestMembrane_Thing_Client {
+export class TestMembrane_Thing$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     passThrough(): void {
     }
     intercept(): void {
     }
 }
-export class TestMembrane_Thing_Server {
+export class TestMembrane_Thing$Server {
     passThrough(): void {
     }
     intercept(): void {
     }
 }
-export class TestMembrane_Thing extends __S {
-    static readonly Client = TestMembrane_Thing_Client;
-    static readonly Server = TestMembrane_Thing_Server;
+export class TestMembrane_Thing extends __I {
+    static readonly Client = TestMembrane_Thing$Client;
+    static readonly Server = TestMembrane_Thing$Server;
     static readonly _capnp = { displayName: "Thing", id: "9352e4e41f173917", size: new __O(0, 0) };
     toString(): string { return "TestMembrane_Thing_" + super.toString(); }
 }
@@ -2806,39 +2862,43 @@ export class TestMembrane_MakeThing$Params extends __S {
 }
 export class TestMembrane_MakeThing$Results extends __S {
     static readonly _capnp = { displayName: "makeThing$Results", id: "e5d4904814ccbf29", size: new __O(0, 1) };
-    getThing(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setThing(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getThing(): TestMembrane_Thing { return __S.getPointerAs(0, TestMembrane_Thing, this); }
+    setThing(value: TestMembrane_Thing): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMembrane_MakeThing$Results_" + super.toString(); }
 }
 export class TestMembrane_CallPassThrough$Params extends __S {
     static readonly _capnp = { displayName: "callPassThrough$Params", id: "945d9f634a6a29da", size: new __O(8, 1) };
-    getThing(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setThing(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getThing(): TestMembrane_Thing { return __S.getPointerAs(0, TestMembrane_Thing, this); }
+    setThing(value: TestMembrane_Thing): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     getTailCall(): boolean { return __S.getBit(0, this); }
     setTailCall(value: boolean): void { __S.setBit(0, value, this); }
     toString(): string { return "TestMembrane_CallPassThrough$Params_" + super.toString(); }
 }
 export class TestMembrane_CallIntercept$Params extends __S {
     static readonly _capnp = { displayName: "callIntercept$Params", id: "8749aac3375c5c71", size: new __O(8, 1) };
-    getThing(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setThing(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getThing(): TestMembrane_Thing { return __S.getPointerAs(0, TestMembrane_Thing, this); }
+    setThing(value: TestMembrane_Thing): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     getTailCall(): boolean { return __S.getBit(0, this); }
     setTailCall(value: boolean): void { __S.setBit(0, value, this); }
     toString(): string { return "TestMembrane_CallIntercept$Params_" + super.toString(); }
 }
 export class TestMembrane_Loopback$Params extends __S {
     static readonly _capnp = { displayName: "loopback$Params", id: "869a1b7ab34b42c9", size: new __O(0, 1) };
-    getThing(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setThing(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getThing(): TestMembrane_Thing { return __S.getPointerAs(0, TestMembrane_Thing, this); }
+    setThing(value: TestMembrane_Thing): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMembrane_Loopback$Params_" + super.toString(); }
 }
 export class TestMembrane_Loopback$Results extends __S {
     static readonly _capnp = { displayName: "loopback$Results", id: "ecd19398fd88ab5c", size: new __O(0, 1) };
-    getThing(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setThing(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    getThing(): TestMembrane_Thing { return __S.getPointerAs(0, TestMembrane_Thing, this); }
+    setThing(value: TestMembrane_Thing): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestMembrane_Loopback$Results_" + super.toString(); }
 }
-export class TestMembrane_Client {
+export class TestMembrane$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     makeThing(): void {
     }
     callPassThrough(): void {
@@ -2848,7 +2908,7 @@ export class TestMembrane_Client {
     loopback(): void {
     }
 }
-export class TestMembrane_Server {
+export class TestMembrane$Server {
     makeThing(): void {
     }
     callPassThrough(): void {
@@ -2858,32 +2918,32 @@ export class TestMembrane_Server {
     loopback(): void {
     }
 }
-export class TestMembrane extends __S {
+export class TestMembrane extends __I {
     static readonly Thing = TestMembrane_Thing;
     static readonly Result = TestMembrane_Result;
-    static readonly Client = TestMembrane_Client;
-    static readonly Server = TestMembrane_Server;
+    static readonly Client = TestMembrane$Client;
+    static readonly Server = TestMembrane$Server;
     static readonly _capnp = { displayName: "TestMembrane", id: "c07d8dcd80a69c0c", size: new __O(0, 0) };
     toString(): string { return "TestMembrane_" + super.toString(); }
 }
 export class TestContainMembrane extends __S {
     static readonly _capnp = { displayName: "TestContainMembrane", id: "949449ad7c11fa5c", size: new __O(0, 2) };
-    getCap(): capnp.Interface { return __S.getPointerAs(0, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(0, this)); }
-    adoptList(value: capnp.Orphan<capnp.List<capnp.Interface>>): void { __S.adopt(value, __S.getPointer(1, this)); }
-    disownList(): capnp.Orphan<capnp.List<capnp.Interface>> { return __S.disown(this.getList()); }
-    getList(): capnp.List<capnp.Interface> { return __S.getList(1, capnp.InterfaceList, this); }
+    getCap(): TestMembrane_Thing { return __S.getPointerAs(0, TestMembrane_Thing, this); }
+    setCap(value: TestMembrane_Thing): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    adoptList(value: capnp.Orphan<capnp.List<TestMembrane_Thing>>): void { __S.adopt(value, __S.getPointer(1, this)); }
+    disownList(): capnp.Orphan<capnp.List<TestMembrane_Thing>> { return __S.disown(this.getList()); }
+    getList(): capnp.List<TestMembrane_Thing> { return __S.getList(1, capnp.InterfaceList, this); }
     hasList(): boolean { return !__S.isNull(__S.getPointer(1, this)); }
-    initList(length: number): capnp.List<capnp.Interface> { return __S.initList(1, capnp.InterfaceList, length, this); }
-    setList(value: capnp.List<capnp.Interface>): void { __S.copyFrom(value, __S.getPointer(1, this)); }
+    initList(length: number): capnp.List<TestMembrane_Thing> { return __S.initList(1, capnp.InterfaceList, length, this); }
+    setList(value: capnp.List<TestMembrane_Thing>): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestContainMembrane_" + super.toString(); }
 }
 export class TestTransferCap_Element extends __S {
     static readonly _capnp = { displayName: "Element", id: "c7263e8f88844abc", size: new __O(0, 2) };
     getText(): string { return __S.getText(0, this); }
     setText(value: string): void { __S.setText(0, value, this); }
-    getCap(): capnp.Interface { return __S.getPointerAs(1, capnp.Interface, this); }
-    setCap(value: capnp.Interface): void { __S.copyFrom(value, __S.getPointer(1, this)); }
+    getCap(): TestInterface { return __S.getPointerAs(1, TestInterface, this); }
+    setCap(value: TestInterface): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "TestTransferCap_Element_" + super.toString(); }
 }
 export class TestTransferCap extends __S {
@@ -2930,7 +2990,11 @@ export class TestKeywordMethods_Return$Results extends __S {
     static readonly _capnp = { displayName: "return$Results", id: "b70872e07eaa992f", size: new __O(0, 0) };
     toString(): string { return "TestKeywordMethods_Return$Results_" + super.toString(); }
 }
-export class TestKeywordMethods_Client {
+export class TestKeywordMethods$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     delete(): void {
     }
     class(): void {
@@ -2940,7 +3004,7 @@ export class TestKeywordMethods_Client {
     return(): void {
     }
 }
-export class TestKeywordMethods_Server {
+export class TestKeywordMethods$Server {
     delete(): void {
     }
     class(): void {
@@ -2950,9 +3014,9 @@ export class TestKeywordMethods_Server {
     return(): void {
     }
 }
-export class TestKeywordMethods extends __S {
-    static readonly Client = TestKeywordMethods_Client;
-    static readonly Server = TestKeywordMethods_Server;
+export class TestKeywordMethods extends __I {
+    static readonly Client = TestKeywordMethods$Client;
+    static readonly Server = TestKeywordMethods$Server;
     static readonly _capnp = { displayName: "TestKeywordMethods", id: "9ae342d394247cfc", size: new __O(0, 0) };
     toString(): string { return "TestKeywordMethods_" + super.toString(); }
 }
@@ -2969,17 +3033,21 @@ export class TestAuthenticatedBootstrap_GetCallerId$Results extends __S {
     setCaller(value: capnp.Pointer): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "TestAuthenticatedBootstrap_GetCallerId$Results_" + super.toString(); }
 }
-export class TestAuthenticatedBootstrap_Client {
+export class TestAuthenticatedBootstrap$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     getCallerId(): void {
     }
 }
-export class TestAuthenticatedBootstrap_Server {
+export class TestAuthenticatedBootstrap$Server {
     getCallerId(): void {
     }
 }
-export class TestAuthenticatedBootstrap extends __S {
-    static readonly Client = TestAuthenticatedBootstrap_Client;
-    static readonly Server = TestAuthenticatedBootstrap_Server;
+export class TestAuthenticatedBootstrap extends __I {
+    static readonly Client = TestAuthenticatedBootstrap$Client;
+    static readonly Server = TestAuthenticatedBootstrap$Server;
     static readonly _capnp = { displayName: "TestAuthenticatedBootstrap", id: "ea72cc77253798cd", size: new __O(0, 0) };
     toString(): string { return "TestAuthenticatedBootstrap_" + super.toString(); }
 }
@@ -3147,17 +3215,21 @@ export class TestNameAnnotationInterface_BadlyNamedMethod$Results extends __S {
     static readonly _capnp = { displayName: "badlyNamedMethod$Results", id: "dcc3cdb4b28f6c86", size: new __O(0, 0) };
     toString(): string { return "TestNameAnnotationInterface_BadlyNamedMethod$Results_" + super.toString(); }
 }
-export class TestNameAnnotationInterface_Client {
+export class TestNameAnnotationInterface$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
     badlyNamedMethod(): void {
     }
 }
-export class TestNameAnnotationInterface_Server {
+export class TestNameAnnotationInterface$Server {
     badlyNamedMethod(): void {
     }
 }
-export class TestNameAnnotationInterface extends __S {
-    static readonly Client = TestNameAnnotationInterface_Client;
-    static readonly Server = TestNameAnnotationInterface_Server;
+export class TestNameAnnotationInterface extends __I {
+    static readonly Client = TestNameAnnotationInterface$Client;
+    static readonly Server = TestNameAnnotationInterface$Server;
     static readonly _capnp = { displayName: "TestNameAnnotationInterface", id: "d112a69d31ed918b", size: new __O(0, 0) };
     toString(): string { return "TestNameAnnotationInterface_" + super.toString(); }
 }
