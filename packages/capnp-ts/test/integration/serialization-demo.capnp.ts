@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "capnp-ts";
-import { ObjectSize as __O, Struct as __S } from 'capnp-ts';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from 'capnp-ts';
 export const _capnpFileId = "b597bf4897e54f89";
 export enum Person_PhoneNumber_Type {
     MOBILE,

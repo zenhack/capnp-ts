@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "../../lib/index";
-import { ObjectSize as __O, Struct as __S } from '../../lib/index';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from '../../lib/index';
 export const _capnpFileId = "c81a48fa54bfdd1f";
 export class Upgrade extends __S {
     static readonly _capnp = { displayName: "Upgrade", id: "8fa95f1989e267fb", size: new __O(8, 4) };
