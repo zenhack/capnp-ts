@@ -995,9 +995,6 @@ export function validate(
 }
 
 export function copyFromInterface(src: Pointer, dst: Pointer): void {
-  src = src;
-  dst = dst;
-
   const srcCapId = getInterfacePointer(src);
   if (srcCapId < 0) {
     trace("copyFromInterface: src has no capId");
