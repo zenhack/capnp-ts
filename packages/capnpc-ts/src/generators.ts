@@ -295,10 +295,10 @@ export function generateServer(
 
   const fullClassName = getFullClassName(node);
   const serverName = `${fullClassName}$Server`;
-  const serverInterfaceName = `${serverName}$Interface`;
+  const serverTargetName = `${serverName}$Target`;
   const clientName = `${fullClassName}$Client`;
 
-  // Generate the `Foobar$Server$Interface` interface
+  // Generate the `Foobar$Server$Target` interface
   {
     const elements = node
       .getInterface()
@@ -343,7 +343,7 @@ export function generateServer(
       ts.createInterfaceDeclaration(
         __, // decorators
         [EXPORT], // modifiers
-        serverInterfaceName, // name
+        serverTargetName, // name
         __, // typeParams
         __, // heritageClauses
         elements
@@ -352,6 +352,17 @@ export function generateServer(
   }
 
   const members: ts.ClassElement[] = [];
+
+  members.push(
+    ts.createProperty(
+      __, // decorators
+      [READONLY], // modifiers
+      "target", // name
+      __, // questionOrExclamationmark
+      ts.createTypeReferenceNode(serverTargetName, __), // type
+      __ // initializer
+    )
+  );
 
   // Generate server constructor
   {
@@ -375,7 +386,7 @@ export function generateServer(
               ts.createPropertyAssignment(
                 "impl",
                 ts.createPropertyAccess(
-                  ts.createIdentifier("iface"),
+                  ts.createIdentifier("target"),
                   method.getName()
                 )
               )
@@ -394,9 +405,9 @@ export function generateServer(
             __, // decorators
             __, // modifiers
             __, // dotDotToken
-            "iface", // name
+            "target", // name
             __, // questionToken
-            ts.createTypeReferenceNode(serverInterfaceName, __), // type
+            ts.createTypeReferenceNode(serverTargetName, __), // type
             __ // initializer
           )
         ], // parameters
@@ -406,7 +417,16 @@ export function generateServer(
               ts.createCall(
                 ts.createIdentifier("super"),
                 __, // typeArguments
-                [ts.createArrayLiteral(serverMethods, true /* multiline */)] // arguments
+                [
+                  ts.createIdentifier("target"),
+                  ts.createArrayLiteral(serverMethods, true /* multiline */)
+                ] // arguments
+              )
+            ),
+            ts.createExpressionStatement(
+              ts.createAssignment(
+                ts.createPropertyAccess(THIS, "target"),
+                ts.createIdentifier("target")
               )
             )
           ],
@@ -415,6 +435,31 @@ export function generateServer(
       )
     );
   }
+
+  members.push(
+    ts.createMethod(
+      __, // decorators
+      __, // modifiers
+      __, // asteriskToken
+      "client", // name
+      __, // questionToken
+      __, // typeParams
+      [], // params
+      ts.createTypeReferenceNode(clientName, __), // type
+      ts.createBlock(
+        [
+          ts.createReturn(
+            ts.createNew(
+              ts.createIdentifier(clientName),
+              __, // typeArgs
+              [THIS] // args
+            )
+          )
+        ],
+        false // multiline
+      )
+    )
+  );
 
   ctx.statements.push(
     ts.createClassDeclaration(
@@ -446,7 +491,6 @@ export function generateClientMethod(
     node.getDisplayName()
   );
 
-  // TODO: fill out
   const name = method.getName();
   const parameters: ts.ParameterDeclaration[] = [];
 
