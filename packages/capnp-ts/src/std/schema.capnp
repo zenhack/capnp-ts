@@ -169,6 +169,33 @@ struct Node {
       targetsAnnotation @30 :Bool;
     }
   }
+
+  struct SourceInfo {
+    # Additional information about a node which is not needed at runtime, but may be useful for
+    # documentation or debugging purposes. This is kept in a separate struct to make sure it
+    # doesn't accidentally get included in contexts where it is not needed. The
+    # `CodeGeneratorRequest` includes this information in a separate array.
+
+    id @0 :Id;
+    # ID of the Node which this info describes.
+
+    docComment @1 :Text;
+    # The top-level doc comment for the Node.
+
+    members @2 :List(Member);
+    # Information about each member -- i.e. fields (for structs), enumerants (for enums), or
+    # methods (for interfaces).
+    #
+    # This list is the same length and order as the corresponding list in the Node, i.e.
+    # Node.struct.fields, Node.enum.enumerants, or Node.interface.methods.
+
+    struct Member {
+      docComment @0 :Text;
+      # Doc comment on the member.
+    }
+
+    # TODO(someday): Record location of the declaration in the original source code.
+  }
 }
 
 struct Field {
@@ -371,8 +398,21 @@ struct Brand {
       # List of parameter bindings.
 
       inherit @2 :Void;
-      # The place where this Brand appears is actually within this scope or a sub-scope,
-      # and the bindings for this scope should be inherited from the reference point.
+      # The place where the Brand appears is within this scope or a sub-scope, and bindings
+      # for this scope are deferred to later Brand applications. This is equivalent to a
+      # pass-through binding list, where each of this scope's parameters is bound to itself.
+      # For example:
+      #
+      #   struct Outer(T) {
+      #     struct Inner {
+      #       value @0 :T;
+      #     }
+      #     innerInherit @0 :Inner;            # Outer Brand.Scope is `inherit`.
+      #     innerBindSelf @1 :Outer(T).Inner;  # Outer Brand.Scope explicitly binds T to T.
+      #   }
+      #
+      # The innerInherit and innerBindSelf fields have equivalent types, but different Brand
+      # styles.
     }
   }
 
@@ -467,6 +507,10 @@ struct CodeGeneratorRequest {
   nodes @0 :List(Node);
   # All nodes parsed by the compiler, including for the files on the command line and their
   # imports.
+
+  sourceInfo @3 :List(Node.SourceInfo);
+  # Information about the original source code for each node, where available. This array may be
+  # omitted or may be missing some nodes if no info is available for them.
 
   requestedFiles @1 :List(RequestedFile);
   # Files which were listed on the command line.

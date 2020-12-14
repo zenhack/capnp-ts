@@ -18,7 +18,7 @@ export let errors = E;
 export async function main(): Promise<void> {
   return run()
     .thenReturn()
-    .tapCatch(reason => {
+    .tapCatch((reason) => {
       // tslint:disable-next-line:no-console
       console.error(reason);
       process.exit(1);
@@ -35,20 +35,20 @@ export async function run(): Bluebird<CodeGeneratorContext> {
       chunks.push(chunk);
     });
 
-    return new Bluebird<void>(resolve => {
+    return new Bluebird<void>((resolve) => {
       process.stdin.on("end", () => {
         trace("read complete");
 
         resolve();
       });
     }).then(() => {
-      const reqBuffer = new Buffer(
+      const reqBuffer = Buffer.allocUnsafe(
         chunks.reduce((l, chunk) => l + chunk.byteLength, 0)
       );
 
       let i = 0;
 
-      chunks.forEach(chunk => {
+      chunks.forEach((chunk) => {
         chunk.copy(reqBuffer, i);
 
         i += chunk.byteLength;

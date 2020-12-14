@@ -698,7 +698,7 @@ export class CapDescriptor extends __S {
     static readonly RECEIVER_HOSTED = CapDescriptor_Which.RECEIVER_HOSTED;
     static readonly RECEIVER_ANSWER = CapDescriptor_Which.RECEIVER_ANSWER;
     static readonly THIRD_PARTY_HOSTED = CapDescriptor_Which.THIRD_PARTY_HOSTED;
-    static readonly _capnp = { displayName: "CapDescriptor", id: "8523ddc40b86b8b0", size: new __O(8, 1) };
+    static readonly _capnp = { displayName: "CapDescriptor", id: "8523ddc40b86b8b0", size: new __O(8, 1), defaultAttachedFd: capnp.getUint8Mask(255) };
     isNone(): boolean { return __S.getUint16(0, this) === 0; }
     setNone(): void { __S.setUint16(0, 0, this); }
     getSenderHosted(): number {
@@ -766,6 +766,8 @@ export class CapDescriptor extends __S {
         __S.setUint16(0, 5, this);
         __S.copyFrom(value, __S.getPointer(0, this));
     }
+    getAttachedFd(): number { return __S.getUint8(2, this, CapDescriptor._capnp.defaultAttachedFd); }
+    setAttachedFd(value: number): void { __S.setUint8(2, value, this); }
     toString(): string { return "CapDescriptor_" + super.toString(); }
     which(): CapDescriptor_Which { return __S.getUint16(0, this); }
 }
@@ -824,7 +826,7 @@ export enum Exception_Type {
 }
 export class Exception extends __S {
     static readonly Type = Exception_Type;
-    static readonly _capnp = { displayName: "Exception", id: "d625b7063acf691a", size: new __O(8, 1) };
+    static readonly _capnp = { displayName: "Exception", id: "d625b7063acf691a", size: new __O(8, 2) };
     getReason(): string { return __S.getText(0, this); }
     setReason(value: string): void { __S.setText(0, value, this); }
     getType(): Exception_Type { return __S.getUint16(4, this); }
@@ -833,6 +835,8 @@ export class Exception extends __S {
     setObsoleteIsCallersFault(value: boolean): void { __S.setBit(0, value, this); }
     getObsoleteDurability(): number { return __S.getUint16(2, this); }
     setObsoleteDurability(value: number): void { __S.setUint16(2, value, this); }
+    getTrace(): string { return __S.getText(1, this); }
+    setTrace(value: string): void { __S.setText(1, value, this); }
     toString(): string { return "Exception_" + super.toString(); }
 }
 Payload._CapTable = capnp.CompositeList(CapDescriptor);
