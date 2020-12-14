@@ -46,9 +46,9 @@ This repository is managed as a monorepo composed of separate packages.
 
 | Package | Version | Dependencies |
 |:--------|:--------|:-------------|
-| [`capnp-ts`](/packages/capnp-ts) | [![npm](https://img.shields.io/npm/v/capnp-ts.svg?maxAge=2592000)](https://www.npmjs.com/package/capnp-ts) | [![Dependency Status](https://david-dm.org/jdiaz5513/capnp-ts.svg?path=packages/capnp-ts)](https://david-dm.org/jdiaz5513/capnp-ts?path=packages/capnp-ts) |
-| [`capnpc-ts`](/packages/capnpc-ts) | [![npm](https://img.shields.io/npm/v/capnpc-ts.svg?maxAge=2592000)](https://www.npmjs.com/package/capnpc-ts) | [![Dependency Status](https://david-dm.org/jdiaz5513/capnpc-ts.svg?path=packages/capnpc-ts)](https://david-dm.org/jdiaz5513/capnpc-ts?path=packages/capnpc-ts) |
-| [`capnpc-js`](/packages/capnpc-js) | [![npm](https://img.shields.io/npm/v/capnpc-js.svg?maxAge=2592000)](https://www.npmjs.com/package/capnpc-js) | [![Dependency Status](https://david-dm.org/jdiaz5513/capnpc-js.svg?path=packages/capnpc-js)](https://david-dm.org/jdiaz5513/capnpc-js?path=packages/capnpc-js) |
+| [`capnp-ts`](/packages/capnp-ts) | [![npm](https://img.shields.io/npm/v/capnp-ts.svg?maxAge=2592000)](https://www.npmjs.com/package/capnp-ts) | [![Dependency Status](https://david-dm.org/CGamesPlay/capnp-ts.svg?path=packages/capnp-ts)](https://david-dm.org/CGamesPlay/capnp-ts?path=packages/capnp-ts) |
+| [`capnpc-ts`](/packages/capnpc-ts) | [![npm](https://img.shields.io/npm/v/capnpc-ts.svg?maxAge=2592000)](https://www.npmjs.com/package/capnpc-ts) | [![Dependency Status](https://david-dm.org/CGamesPlay/capnpc-ts.svg?path=packages/capnpc-ts)](https://david-dm.org/CGamesPlay/capnpc-ts?path=packages/capnpc-ts) |
+| [`capnpc-js`](/packages/capnpc-js) | [![npm](https://img.shields.io/npm/v/capnpc-js.svg?maxAge=2592000)](https://www.npmjs.com/package/capnpc-js) | [![Dependency Status](https://david-dm.org/CGamesPlay/capnpc-js.svg?path=packages/capnpc-js)](https://david-dm.org/CGamesPlay/capnpc-js?path=packages/capnpc-js) |
 
 - `capnp-ts` is the core Cap'n Proto library for Typescript. It is a required import for all compiled schema files, and the starting point for reading/writing a Cap'n Proto message.
 - `capnpc-ts` is the schema compiler plugin for TypeScript. It is intended to be invoked by the [`capnp`](https://capnproto.org/capnp-tool.html) tool.
