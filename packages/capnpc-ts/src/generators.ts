@@ -63,11 +63,18 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
   const tsAnnotationFile = ctx.nodes.find((n) => n.getId().equals(tsFileId));
   // We might not find the importPath annotation; that's definitely a bug but let's move on.
   const tsImportPathAnnotation =
-    tsAnnotationFile && tsAnnotationFile.getNestedNodes().find((n) => n.getName() === "importPath");
+    tsAnnotationFile &&
+    tsAnnotationFile.getNestedNodes().find((n) => n.getName() === "importPath");
   // There may not necessarily be an import path annotation on the file node. That's fine.
   const importAnnotation =
-    tsImportPathAnnotation && fileNode.getAnnotations().find((a) => a.getId().equals(tsImportPathAnnotation.getId()));
-  const importPath = importAnnotation === undefined ? "capnp-ts" : importAnnotation.getValue().getText();
+    tsImportPathAnnotation &&
+    fileNode
+      .getAnnotations()
+      .find((a) => a.getId().equals(tsImportPathAnnotation.getId()));
+  const importPath =
+    importAnnotation === undefined
+      ? "capnp-ts"
+      : importAnnotation.getValue().getText();
 
   /* tslint:disable-next-line */
   let u: ts.Identifier | undefined;
@@ -193,7 +200,12 @@ export function generateEnumNode(ctx: CodeGeneratorFileContext, node: s.Node): v
     .toArray()
     .sort(compareCodeOrder)
     .map((e) => ts.createEnumMember(util.c2s(e.getName())));
-  const d = ts.createEnumDeclaration(__, [EXPORT], getFullClassName(node), members);
+  const d = ts.createEnumDeclaration(
+    __,
+    [EXPORT],
+    getFullClassName(node),
+    members
+  );
 
   ctx.statements.push(d);
 }
@@ -215,6 +227,8 @@ export function generateInterfaceClasses(
   ctx: CodeGeneratorFileContext,
   node: s.Node
 ): void {
+  trace("generateInterfaceClasses(%s) [%s]", node, node.getDisplayName());
+
   // Generate the parameter and result structs first
   generateMethodStructs(ctx, node);
 
@@ -232,7 +246,7 @@ export function generateMethodStructs(
   node
     .getInterface()
     .getMethods()
-    .forEach(method => {
+    .forEach((method) => {
       const paramNode = lookupNode(ctx, method.getParamStructType());
       const resultNode = lookupNode(ctx, method.getResultStructType());
 
@@ -259,7 +273,7 @@ export function generateServer(
     const elements = node
       .getInterface()
       .getMethods()
-      .map<ts.TypeElement>(method => {
+      .map<ts.TypeElement>((method) => {
         const paramTypeName = getFullClassName(
           lookupNode(ctx, method.getParamStructType())
         );
@@ -287,7 +301,7 @@ export function generateServer(
               __, // questionToken
               ts.createTypeReferenceNode(resultTypeName, __), // type,
               __ // initializer
-            )
+            ),
           ], // params
           ts.createTypeReferenceNode("Promise", [VOID_TYPE]), // type
           method.getName(), // name
@@ -345,7 +359,7 @@ export function generateServer(
                   ts.createIdentifier("target"),
                   method.getName()
                 )
-              )
+              ),
             ],
             true // multiline
           )
@@ -365,7 +379,7 @@ export function generateServer(
             __, // questionToken
             ts.createTypeReferenceNode(serverTargetName, __), // type
             __ // initializer
-          )
+          ),
         ], // parameters
         ts.createBlock(
           [
@@ -375,7 +389,7 @@ export function generateServer(
                 __, // typeArguments
                 [
                   ts.createIdentifier("target"),
-                  ts.createArrayLiteral(serverMethods, true /* multiline */)
+                  ts.createArrayLiteral(serverMethods, true /* multiline */),
                 ] // arguments
               )
             ),
@@ -384,7 +398,7 @@ export function generateServer(
                 ts.createPropertyAccess(THIS, "target"),
                 ts.createIdentifier("target")
               )
-            )
+            ),
           ],
           true // multiline
         ) // body
@@ -410,7 +424,7 @@ export function generateServer(
               __, // typeArgs
               [THIS] // args
             )
-          )
+          ),
         ],
         false // multiline
       )
@@ -464,7 +478,7 @@ export function generateClientMethod(
       "capnp.Method",
       [
         ts.createTypeReferenceNode(paramTypeName, __),
-        ts.createTypeReferenceNode(resultTypeName, __)
+        ts.createTypeReferenceNode(resultTypeName, __),
       ] // typeArgs
     )
   );
@@ -497,7 +511,7 @@ export function generateClientMethod(
         ts.createPropertyAssignment(
           "methodName",
           ts.createStringLiteral(method.getName())
-        )
+        ),
       ],
       true /* multiline */
     )
@@ -528,11 +542,11 @@ export function generateClientMethod(
                 "params", // name
                 __, // questionToken
                 ts.createTypeReferenceNode(paramTypeName, __) // type
-              )
+              ),
             ],
             VOID_TYPE // type
           )
-        )
+        ),
       ], // parameters
       ts.createTypeReferenceNode(`${resultTypeName}$Promise`, __),
       ts.createBlock(
@@ -566,13 +580,13 @@ export function generateClientMethod(
                           ts.createPropertyAssignment(
                             "paramsFunc",
                             ts.createIdentifier("paramsFunc")
-                          )
+                          ),
                         ],
                         true // multiline
-                      )
+                      ),
                     ]
                   )
-                )
+                ),
               ],
               ts.NodeFlags.Const
             )
@@ -590,10 +604,10 @@ export function generateClientMethod(
                     __, // typeArgs
                     [
                       ts.createIdentifier(resultTypeName),
-                      ts.createIdentifier("answer")
+                      ts.createIdentifier("answer"),
                     ]
                   )
-                )
+                ),
               ],
               ts.NodeFlags.Const
             )
@@ -605,7 +619,7 @@ export function generateClientMethod(
               __, // typeArguments
               [ts.createIdentifier("pipeline")]
             )
-          )
+          ),
         ],
         true // multiline
       )
@@ -659,7 +673,7 @@ export function generateClient(
               ts.createPropertyAccess(THIS, "client"),
               ts.createIdentifier("client")
             )
-          )
+          ),
         ],
         true // multiline
       ) // body
@@ -716,7 +730,7 @@ export function generateClient(
             ts.createIdentifier(clientName),
             "interfaceId"
           ),
-          ts.createIdentifier(clientName)
+          ts.createIdentifier(clientName),
         ]
       )
     )
@@ -735,7 +749,10 @@ export function generateNode(ctx: CodeGeneratorFileContext, node: s.Node): void 
 
   /** An array of group structs formed as children of this struct. They appear before the struct node in the file. */
   const groupNodes = ctx.nodes.filter(
-    (n) => n.getScopeId().equals(nodeId) && n.isStruct() && n.getStruct().getIsGroup()
+    (n) =>
+      n.getScopeId().equals(nodeId) &&
+      n.isStruct() &&
+      n.getStruct().getIsGroup()
   );
   /**
    * An array of nodes that are nested within this node; these must appear first since those symbols will be
@@ -799,7 +816,7 @@ export function generateResultPromise(
   const PipelineType = ts.createTypeReferenceNode("capnp.Pipeline", [
     ANY_TYPE,
     ANY_TYPE,
-    ts.createTypeReferenceNode(resultsClassName, __)
+    ts.createTypeReferenceNode(resultsClassName, __),
   ]);
 
   const members: ts.ClassElement[] = [];
@@ -817,7 +834,7 @@ export function generateResultPromise(
               ts.createPropertyAccess(THIS, "pipeline"),
               ts.createIdentifier("pipeline")
             )
-          )
+          ),
         ],
         true // multiline
       ) // body
@@ -825,10 +842,7 @@ export function generateResultPromise(
   );
 
   const struct = node.getStruct();
-  const fields = struct
-    .getFields()
-    .toArray()
-    .sort(compareCodeOrder);
+  const fields = struct.getFields().toArray().sort(compareCodeOrder);
 
   const generatePromiseFieldMethod = (field: s.Field) => {
     let jsType: string;
@@ -870,7 +884,7 @@ export function generateResultPromise(
         __, // typeArguments
         [
           ts.createIdentifier(promisedJsType),
-          ts.createNumericLiteral(slot.getOffset().toString())
+          ts.createNumericLiteral(slot.getOffset().toString()),
         ] // arguments
       ); // call
 
@@ -934,7 +948,7 @@ export function generateResultPromise(
                 __, // typeArguments
                 __ // parameters
               ) // call
-            ) // await
+            ), // await
           ],
           true, // returns
           false // allowSingleLine
@@ -1000,9 +1014,15 @@ export function generateStructFieldMethods(
   /** __S.copyFrom(value, __S.getPointer(0, this)) */
   const copyFromValue = ts.createCall(ts.createPropertyAccess(STRUCT, "copyFrom"), __, [VALUE, getPointer]);
   /** capnp.Orphan<Foo> */
-  const orphanType = ts.createTypeReferenceNode("capnp.Orphan", [jsTypeReference]);
-  const discriminantOffsetLiteral = ts.createNumericLiteral((discriminantOffset * 2).toString());
-  const discriminantValueLiteral = ts.createNumericLiteral(discriminantValue.toString());
+  const orphanType = ts.createTypeReferenceNode("capnp.Orphan", [
+    jsTypeReference,
+  ]);
+  const discriminantOffsetLiteral = ts.createNumericLiteral(
+    (discriminantOffset * 2).toString()
+  );
+  const discriminantValueLiteral = ts.createNumericLiteral(
+    discriminantValue.toString()
+  );
   /** __S.getUint16(0, this) */
   const getDiscriminant = ts.createCall(ts.createPropertyAccess(STRUCT, "getUint16"), __, [
     discriminantOffsetLiteral,
@@ -1038,7 +1058,10 @@ export function generateStructFieldMethods(
       get = ts.createCall(ts.createPropertyAccess(STRUCT, "getPointer"), __, getArgs);
       has = true;
       /** __S.copyFrom(value, __S.getPointer(0, this)) */
-      set = ts.createCall(ts.createPropertyAccess(STRUCT, "copyFrom"), __, [VALUE, get]);
+      set = ts.createCall(ts.createPropertyAccess(STRUCT, "copyFrom"), __, [
+        VALUE,
+        get,
+      ]);
 
       break;
 
@@ -1064,7 +1087,11 @@ export function generateStructFieldMethods(
       /** __S.getXYZ(0, this) */
       get = ts.createCall(ts.createPropertyAccess(STRUCT, getter), __, getArgs);
       /** __S.setXYZ(0, value, this) */
-      set = ts.createCall(ts.createPropertyAccess(STRUCT, setter), __, [byteOffset, VALUE, THIS]);
+      set = ts.createCall(ts.createPropertyAccess(STRUCT, setter), __, [
+        byteOffset,
+        VALUE,
+        THIS,
+      ]);
 
       break;
     }
@@ -1079,7 +1106,11 @@ export function generateStructFieldMethods(
       get = ts.createCall(ts.createPropertyAccess(STRUCT, "getData"), __, getArgs);
       has = true;
       /** __S.initData(0, length, this) */
-      init = ts.createCall(ts.createPropertyAccess(STRUCT, "initData"), __, [offsetLiteral, LENGTH, THIS]);
+      init = ts.createCall(ts.createPropertyAccess(STRUCT, "initData"), __, [
+        offsetLiteral,
+        LENGTH,
+        THIS,
+      ]);
       set = copyFromValue;
 
       break;
@@ -1187,7 +1218,11 @@ export function generateStructFieldMethods(
       /** __S.getText(0, this) */
       get = ts.createCall(ts.createPropertyAccess(STRUCT, "getText"), __, getArgs);
       /** __S.setText(0, value, this) */
-      set = ts.createCall(ts.createPropertyAccess(STRUCT, "setText"), __, [offsetLiteral, VALUE, THIS]);
+      set = ts.createCall(ts.createPropertyAccess(STRUCT, "setText"), __, [
+        offsetLiteral,
+        VALUE,
+        THIS,
+      ]);
 
       break;
 
@@ -1202,7 +1237,10 @@ export function generateStructFieldMethods(
       const groupType = ts.createIdentifier(jsType);
 
       /** __S.getAs(Foo, this); */
-      get = ts.createCall(ts.createPropertyAccess(STRUCT, "getAs"), __, [groupType, THIS]);
+      get = ts.createCall(ts.createPropertyAccess(STRUCT, "getAs"), __, [
+        groupType,
+        THIS,
+      ]);
       init = get;
 
       break;
@@ -1215,8 +1253,15 @@ export function generateStructFieldMethods(
 
   // adoptFoo(value: capnp.Orphan<Foo>): void { __S.adopt(value, this._getPointer(3)); }
   if (adopt) {
-    const parameters = [ts.createParameter(__, __, __, VALUE, __, orphanType, __)];
-    const expressions = [ts.createCall(ts.createPropertyAccess(STRUCT, "adopt"), __, [VALUE, getPointer])];
+    const parameters = [
+      ts.createParameter(__, __, __, VALUE, __, orphanType, __),
+    ];
+    const expressions = [
+      ts.createCall(ts.createPropertyAccess(STRUCT, "adopt"), __, [
+        VALUE,
+        getPointer,
+      ]),
+    ];
 
     if (union) expressions.unshift(setDiscriminant);
 
@@ -1225,8 +1270,14 @@ export function generateStructFieldMethods(
 
   // disownFoo(): capnp.Orphan<Foo> { return __S.disown(this.getFoo()); }
   if (disown) {
-    const getter = ts.createCall(ts.createPropertyAccess(THIS, `get${properName}`), __, []);
-    const expressions = [ts.createCall(ts.createPropertyAccess(STRUCT, "disown"), __, [getter])];
+    const getter = ts.createCall(
+      ts.createPropertyAccess(THIS, `get${properName}`),
+      __,
+      []
+    );
+    const expressions = [
+      ts.createCall(ts.createPropertyAccess(STRUCT, "disown"), __, [getter]),
+    ];
 
     members.push(createMethod(`disown${properName}`, [], orphanType, expressions));
   }
@@ -1253,7 +1304,11 @@ export function generateStructFieldMethods(
   if (has) {
     // !__S.isNull(this._getPointer(8));
     const expressions = [
-      ts.createLogicalNot(ts.createCall(ts.createPropertyAccess(STRUCT, "isNull"), __, [getPointer])),
+      ts.createLogicalNot(
+        ts.createCall(ts.createPropertyAccess(STRUCT, "isNull"), __, [
+          getPointer,
+        ])
+      ),
     ];
 
     members.push(createMethod(`has${properName}`, [], BOOLEAN_TYPE, expressions));
@@ -1263,7 +1318,17 @@ export function generateStructFieldMethods(
   if (init) {
     const parameters =
       whichType === s.Type.DATA || whichType === s.Type.LIST
-        ? [ts.createParameter(__, __, __, listLengthParameterName, __, NUMBER_TYPE, __)]
+        ? [
+            ts.createParameter(
+              __,
+              __,
+              __,
+              listLengthParameterName,
+              __,
+              NUMBER_TYPE,
+              __
+            ),
+          ]
         : [];
     const expressions = [init];
 
@@ -1276,7 +1341,9 @@ export function generateStructFieldMethods(
   if (union) {
     const left = ts.createCall(ts.createPropertyAccess(STRUCT, "getUint16"), __, [discriminantOffsetLiteral, THIS]);
     const right = discriminantValueLiteral;
-    const expressions = [ts.createBinary(left, ts.SyntaxKind.EqualsEqualsEqualsToken, right)];
+    const expressions = [
+      ts.createBinary(left, ts.SyntaxKind.EqualsEqualsEqualsToken, right),
+    ];
 
     members.push(createMethod(`is${properName}`, [], BOOLEAN_TYPE, expressions));
   }
@@ -1318,11 +1385,17 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   const dataByteLength = struct ? dataWordCount * 8 : 0;
   const discriminantCount = struct ? struct.getDiscriminantCount() : 0;
   const discriminantOffset = struct ? struct.getDiscriminantOffset() : 0;
-  const fields = struct ? struct.getFields().toArray().sort(compareCodeOrder) : [];
+  const fields = struct
+    ? struct.getFields().toArray().sort(compareCodeOrder)
+    : [];
   const pointerCount = struct ? struct.getPointerCount() : 0;
 
-  const concreteLists = fields.filter(needsConcreteListClass).sort(compareCodeOrder);
-  const consts = ctx.nodes.filter((n) => n.getScopeId().equals(nodeId) && n.isConst());
+  const concreteLists = fields
+    .filter(needsConcreteListClass)
+    .sort(compareCodeOrder);
+  const consts = ctx.nodes.filter(
+    (n) => n.getScopeId().equals(nodeId) && n.isConst()
+  );
   // const groups = ctx.nodes.filter(
   //   (n) => n.getScopeId().equals(nodeId) && n.isStruct() && n.getStruct().getIsGroup());
   const hasUnnamedUnion = discriminantCount !== 0;
@@ -1337,7 +1410,9 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   members.push(...consts.map(createConstProperty));
 
   // static readonly WHICH = MyStruct_Which.WHICH;
-  members.push(...unionFields.map((f) => createUnionConstProperty(fullClassName, f)));
+  members.push(
+    ...unionFields.map((f) => createUnionConstProperty(fullClassName, f))
+  );
 
   // static readonly NestedStruct = MyStruct_NestedStruct;
   members.push(...nestedNodes.map(createNestedNodeProperty));
@@ -1369,8 +1444,10 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
 
   const defaultValues = fields.reduce(
     (acc, f) =>
-      f.isSlot() && f.getSlot().getHadExplicitDefault() && f.getSlot().getType().which() !== s.Type.VOID
-        ? acc.concat(generateDefaultValue(f))
+      f.isSlot() &&
+      f.getSlot().getHadExplicitDefault() &&
+      f.getSlot().getType().which() !== s.Type.VOID
+        ? acc.concat(generateDefaultValue(node, f))
         : acc,
     [] as ts.PropertyAssignment[]
   );
@@ -1445,7 +1522,9 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   // class's static initializer because the nested type might not be defined yet.
   // FIXME: This might be solvable with topological sorting?
 
-  ctx.concreteLists.push(...concreteLists.map<[string, s.Field]>((f) => [fullClassName, f]));
+  ctx.concreteLists.push(
+    ...concreteLists.map<[string, s.Field]>((f) => [fullClassName, f])
+  );
 }
 
 export function generateUnnamedUnionEnum(
@@ -1456,7 +1535,10 @@ export function generateUnnamedUnionEnum(
   const members = unionFields
     .sort(compareCodeOrder)
     .map((f) =>
-      ts.createEnumMember(util.c2s(f.getName()), ts.createNumericLiteral(f.getDiscriminantValue().toString()))
+      ts.createEnumMember(
+        util.c2s(f.getName()),
+        ts.createNumericLiteral(f.getDiscriminantValue().toString())
+      )
     );
   const d = ts.createEnumDeclaration(__, [EXPORT], `${fullClassName}_Which`, members);
 

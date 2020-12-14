@@ -122,17 +122,58 @@ export class ListManiaInterface_GetListMania$Results extends __S {
     setResult(value: capnp.List<ListManiaInterface>): void { __S.copyFrom(value, __S.getPointer(0, this)); }
     toString(): string { return "ListManiaInterface_GetListMania$Results_" + super.toString(); }
 }
+export class ListManiaInterface_GetListMania$Results$Promise {
+    pipeline: capnp.Pipeline<any, any, ListManiaInterface_GetListMania$Results>;
+    constructor(pipeline: capnp.Pipeline<any, any, ListManiaInterface_GetListMania$Results>) {
+        this.pipeline = pipeline;
+    }
+    async promise(): Promise<ListManiaInterface_GetListMania$Results> {
+        return await this.pipeline.struct();
+    }
+}
 export class ListManiaInterface$Client {
     client: capnp.Client;
+    static readonly interfaceId: capnp.Uint64 = capnp.Uint64.fromHexString("8a94079c3c57204f");
     constructor(client: capnp.Client) {
         this.client = client;
     }
-    getListMania(): void {
+    static readonly methods: [
+        capnp.Method<ListManiaInterface_GetListMania$Params, ListManiaInterface_GetListMania$Results>
+    ] = [
+        {
+            ParamsClass: ListManiaInterface_GetListMania$Params,
+            ResultsClass: ListManiaInterface_GetListMania$Results,
+            interfaceId: ListManiaInterface$Client.interfaceId,
+            methodId: 0,
+            interfaceName: "packages/capnp-ts/test/integration/list-mania.capnp:ListManiaInterface",
+            methodName: "getListMania"
+        }
+    ];
+    getListMania(paramsFunc?: (params: ListManiaInterface_GetListMania$Params) => void): ListManiaInterface_GetListMania$Results$Promise {
+        const answer = this.client.call({
+            method: ListManiaInterface$Client.methods[0],
+            paramsFunc: paramsFunc
+        });
+        const pipeline = new capnp.Pipeline(ListManiaInterface_GetListMania$Results, answer);
+        return new ListManiaInterface_GetListMania$Results$Promise(pipeline);
     }
 }
-export class ListManiaInterface$Server {
-    getListMania(): void {
+capnp.Registry.register(ListManiaInterface$Client.interfaceId, ListManiaInterface$Client);
+export interface ListManiaInterface$Server$Target {
+    getListMania(params: ListManiaInterface_GetListMania$Params, results: ListManiaInterface_GetListMania$Results): Promise<void>;
+}
+export class ListManiaInterface$Server extends capnp.Server {
+    readonly target: ListManiaInterface$Server$Target;
+    constructor(target: ListManiaInterface$Server$Target) {
+        super(target, [
+            {
+                ...ListManiaInterface$Client.methods[0],
+                impl: target.getListMania
+            }
+        ]);
+        this.target = target;
     }
+    client(): ListManiaInterface$Client { return new ListManiaInterface$Client(this); }
 }
 export class ListManiaInterface extends __I {
     static readonly Client = ListManiaInterface$Client;
