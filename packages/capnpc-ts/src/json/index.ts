@@ -53,7 +53,8 @@ const generateHeaderComment = R.curry((ctx: FileGenContext): void => {
 
 const generateImports = R.curry((ctx: FileGenContext): void => {
   const { fd, fileNode } = ctx;
-  const importAnnotation = R.find(a => a.id === IMPORT_ANNOTATION_ID,
+  const importAnnotation = R.find(
+    (a) => a.id === IMPORT_ANNOTATION_ID,
     fileNode.annotations
   );
   const importPath =
@@ -81,7 +82,8 @@ const generateUnnamedUnionEnum = R.curry(
       fd,
       `
 export enum ${NodeClassName}_Which {
-${R.map(field => `  ${c2s(field.name)} = ${field.discriminantValue},`,
+${R.map(
+  (field) => `  ${c2s(field.name)} = ${field.discriminantValue},`,
   unionFields
 ).join("\n")}
 }
@@ -480,17 +482,21 @@ const generateStructNode = R.curry((ctx: FileGenContext, node: INode): void => {
     pointerCount,
   } = node.struct;
   const hasUnnamedUnion = discriminantCount !== 0;
-  const nestedNodes = R.filter<INode>(n => n.const === undefined,
-    R.map(lookupNode(ctx), node.nestedNodes || [])
+  const nestedNodes = R.filter(
+    (n: INode) => n.const === undefined,
+    R.map(lookupNode(ctx), node.nestedNodes || ([] as INode_NestedNode[]))
   );
   const concreteLists = R.filter(Field.needsConcreteListClass, fields);
-  const consts = R.filter(n => n.scopeId === node.id && n.const !== undefined,
+  const consts = R.filter(
+    (n) => n.scopeId === node.id && n.const !== undefined,
     cgr.nodes
   );
-  const groups = R.filter(n => n.scopeId === node.id && n.struct !== undefined && n.struct.isGroup,
+  const groups = R.filter(
+    (n) => n.scopeId === node.id && n.struct !== undefined && n.struct.isGroup,
     cgr.nodes
   );
 
+  /* tslint:disable-next-line:no-use-before-declare */
   R.forEach(generateNode(ctx), nestedNodes);
 
   if (hasUnnamedUnion) generateUnnamedUnionEnum(ctx, node);
@@ -515,7 +521,8 @@ export class ${Class} extends capnp.Struct {
     fs.writeSync(
       fd,
       `
-${R.map(field =>
+${R.map(
+  (field) =>
     `  static _${c2t(field.name)}: ${toJsType(
       ctx,
       (field.slot as IField_Slot).type,
@@ -531,7 +538,8 @@ ${R.map(field =>
 
     ctx.concreteListInitializers.push.apply(
       ctx.concreteListInitializers,
-      R.map(field =>
+      R.map(
+        (field) =>
           `${Class}._${c2t(field.name)} = ${toConcreteListType(
             ctx,
             (field.slot as IField_Slot).type
@@ -545,7 +553,8 @@ ${R.map(field =>
     fs.writeSync(
       fd,
       `
-${R.map(c =>
+${R.map(
+  (c) =>
     `  static readonly ${c2s(Node.getDisplayNamePrefix(c))} = ${
       c.const && Value.toJsPrimitive(c.const.value)
     };`,
@@ -559,7 +568,8 @@ ${R.map(c =>
     fs.writeSync(
       fd,
       `
-${R.map(nested =>
+${R.map(
+  (nested) =>
     `  static readonly ${Node.getDisplayNamePrefix(
       nested
     )} = ${Node.getFullClassName(nested)};`,
@@ -585,7 +595,8 @@ ${R.map(nested =>
     fs.writeSync(
       fd,
       `
-${R.map(field =>
+${R.map(
+  (field) =>
     `  static readonly ${c2s(field.name)} = ${Class}_Which.${c2s(field.name)};`,
   unionFields
 ).join("\n")}
@@ -629,7 +640,7 @@ const generateEnumNode = R.curry((ctx: FileGenContext, node: INode): void => {
     fd,
     `
 export enum ${Enum} {
-${R.map(e => `  ${c2s(e.name)},`, node.enum.enumerants).join("\n")}
+${R.map((e) => `  ${c2s(e.name)},`, node.enum.enumerants).join("\n")}
 }
 `
   );
@@ -640,7 +651,8 @@ const generateNode = R.curry((ctx: FileGenContext, node: INode): void => {
 
   if (genNodeIds.indexOf(node.id) > -1) return;
 
-  const groupNodes = R.filter(n => n.scopeId === node.id && n.struct !== undefined && n.struct.isGroup,
+  const groupNodes = R.filter(
+    (n) => n.scopeId === node.id && n.struct !== undefined && n.struct.isGroup,
     cgr.nodes
   );
   const nestedNodes = R.map(lookupNode(ctx), node.nestedNodes || []);

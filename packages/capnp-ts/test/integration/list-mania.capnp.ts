@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "../../lib/index";
-import { ObjectSize as __O, Struct as __S } from '../../lib/index';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from '../../lib/index';
 export const _capnpFileId = "b4dbefd56457c333";
 export class ListMania extends __S {
     static readonly _capnp = { displayName: "ListMania", id: "d0a988493b63e78b", size: new __O(0, 16) };
@@ -64,12 +64,12 @@ export class ListMania extends __S {
     hasInt64List(): boolean { return !__S.isNull(__S.getPointer(8, this)); }
     initInt64List(length: number): capnp.List<capnp.Int64> { return __S.initList(8, capnp.Int64List, length, this); }
     setInt64List(value: capnp.List<capnp.Int64>): void { __S.copyFrom(value, __S.getPointer(8, this)); }
-    adoptInterfaceList(value: capnp.Orphan<capnp.List<capnp.Interface>>): void { __S.adopt(value, __S.getPointer(9, this)); }
-    disownInterfaceList(): capnp.Orphan<capnp.List<capnp.Interface>> { return __S.disown(this.getInterfaceList()); }
-    getInterfaceList(): capnp.List<capnp.Interface> { return __S.getList(9, capnp.InterfaceList, this); }
+    adoptInterfaceList(value: capnp.Orphan<capnp.List<ListManiaInterface>>): void { __S.adopt(value, __S.getPointer(9, this)); }
+    disownInterfaceList(): capnp.Orphan<capnp.List<ListManiaInterface>> { return __S.disown(this.getInterfaceList()); }
+    getInterfaceList(): capnp.List<ListManiaInterface> { return __S.getList(9, capnp.InterfaceList, this); }
     hasInterfaceList(): boolean { return !__S.isNull(__S.getPointer(9, this)); }
-    initInterfaceList(length: number): capnp.List<capnp.Interface> { return __S.initList(9, capnp.InterfaceList, length, this); }
-    setInterfaceList(value: capnp.List<capnp.Interface>): void { __S.copyFrom(value, __S.getPointer(9, this)); }
+    initInterfaceList(length: number): capnp.List<ListManiaInterface> { return __S.initList(9, capnp.InterfaceList, length, this); }
+    setInterfaceList(value: capnp.List<ListManiaInterface>): void { __S.copyFrom(value, __S.getPointer(9, this)); }
     adoptTextList(value: capnp.Orphan<capnp.List<string>>): void { __S.adopt(value, __S.getPointer(10, this)); }
     disownTextList(): capnp.Orphan<capnp.List<string>> { return __S.disown(this.getTextList()); }
     getTextList(): capnp.List<string> { return __S.getList(10, capnp.TextList, this); }
@@ -108,7 +108,35 @@ export class ListMania extends __S {
     setVoidList(value: capnp.List<capnp.Void>): void { __S.copyFrom(value, __S.getPointer(15, this)); }
     toString(): string { return "ListMania_" + super.toString(); }
 }
-export class ListManiaInterface extends __S {
+export class ListManiaInterface_GetListMania$Params extends __S {
+    static readonly _capnp = { displayName: "getListMania$Params", id: "f7bf50e8ad110566", size: new __O(0, 0) };
+    toString(): string { return "ListManiaInterface_GetListMania$Params_" + super.toString(); }
+}
+export class ListManiaInterface_GetListMania$Results extends __S {
+    static readonly _capnp = { displayName: "getListMania$Results", id: "e89af40dc5417fee", size: new __O(0, 1) };
+    adoptResult(value: capnp.Orphan<capnp.List<ListManiaInterface>>): void { __S.adopt(value, __S.getPointer(0, this)); }
+    disownResult(): capnp.Orphan<capnp.List<ListManiaInterface>> { return __S.disown(this.getResult()); }
+    getResult(): capnp.List<ListManiaInterface> { return __S.getList(0, capnp.InterfaceList, this); }
+    hasResult(): boolean { return !__S.isNull(__S.getPointer(0, this)); }
+    initResult(length: number): capnp.List<ListManiaInterface> { return __S.initList(0, capnp.InterfaceList, length, this); }
+    setResult(value: capnp.List<ListManiaInterface>): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    toString(): string { return "ListManiaInterface_GetListMania$Results_" + super.toString(); }
+}
+export class ListManiaInterface$Client {
+    client: capnp.Client;
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
+    getListMania(): void {
+    }
+}
+export class ListManiaInterface$Server {
+    getListMania(): void {
+    }
+}
+export class ListManiaInterface extends __I {
+    static readonly Client = ListManiaInterface$Client;
+    static readonly Server = ListManiaInterface$Server;
     static readonly _capnp = { displayName: "ListManiaInterface", id: "8a94079c3c57204f", size: new __O(0, 0) };
     toString(): string { return "ListManiaInterface_" + super.toString(); }
 }

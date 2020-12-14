@@ -139,3 +139,26 @@ export const PTR_WRITE_CONST_LIST =
   "CAPNP-TS043 Attempted to write to a const list.";
 export const PTR_WRITE_CONST_STRUCT =
   "CAPNP-TS044 Attempted to write to a const struct.";
+
+// RPC errors
+//
+// RPC is hard too.
+
+export const RPC_NULL_CLIENT = "CAPNP-TS100 Call on null client.";
+
+export const RPC_CALL_QUEUE_FULL =
+  "CAPNP-TS101 Promised answer call queue full";
+export const RPC_QUEUE_CALL_CANCEL = "CAPNP-TS102 Queue call canceled";
+
+export const RPC_CLOSED_CLIENT = "CAPNP-TS104 Close() called on closed client";
+
+export const RPC_ZERO_REF = "CAPNP-TS105 Ref() called on zeroed refcount";
+
+export const RPC_IMPORT_CLOSED = "CAPNP-TS106 Call on closed import";
+
+export const RPC_METHOD_NOT_IMPLEMENTED = "CAPNP-TS107 Method not implemented";
+
+export const RPC_UNIMPLEMENTED =
+  "CAPNP-TS108 Remote used unimplemented feature";
+
+export const RPC_BAD_TARGET = "CAPNP-TS109 Target not found";
