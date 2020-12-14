@@ -5,24 +5,24 @@
   },
   "description": "Strongly typed Cap'n Proto implementation for the browser and Node.js using TypeScript",
   "devDependencies": {
-    "codecov": "^3.0.4",
-    "glob": "^7.1.3",
-    "gulp": "^3.9.1",
-    "gulp-sourcemaps": "^2.6.1",
-    "gulp-tslint": "^8.1.3",
-    "gulp-typescript": "^5.0.0-alpha.3",
+    "codecov": "^3.8.1",
+    "glob": "^7.1.6",
+    "gulp": "^4.0.2",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-tslint": "^8.1.4",
+    "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-util": "^3.0.8",
-    "husky": "^1.0.0-rc.13",
-    "lerna": "^3.1.4",
-    "lint-staged": "^7.2.2",
-    "merge-stream": "^1.0.1",
-    "nodemon": "^1.18.3",
-    "prettier": "1.14.2",
-    "tap": "^12.0.1",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
+    "husky": "^4.3.6",
+    "lerna": "^3.22.1",
+    "lint-staged": "^10.5.3",
+    "merge-stream": "^2.0.0",
+    "nodemon": "^2.0.6",
+    "prettier": "2.2.1",
+    "tap": "^14.11.0",
+    "ts-node": "^9.1.1",
+    "tslint": "^6.1.3",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.0.1"
+    "typescript": "^4.1.3"
   },
   "homepage": "https://github.com/jdiaz5513/capnp-ts#readme",
   "husky": {
@@ -37,15 +37,9 @@
   ],
   "license": "MIT",
   "lint-staged": {
-    "linters": {
-      "*.ts": [
-        "prettier --write",
-        "tslint -p .",
-        "git add"
-      ]
-    },
-    "ignore": [
-      "packages/capnpc-ts/bin/**/*.ts"
+    "!(packages/capnpc-ts/bin/**/*).ts": [
+      "prettier --write",
+      "tslint --fix -p ."
     ]
   },
   "main": "lib/index",

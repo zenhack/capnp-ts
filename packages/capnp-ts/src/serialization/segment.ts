@@ -157,6 +157,28 @@ export class Segment implements DataView {
   }
 
   /**
+   * Read a BigInt64 value out of this segment.
+   *
+   * @param {number} byteOffset The offset in bytes to the value.
+   * @returns {number} The value.
+   */
+
+  getBigInt64(byteOffset: number): bigint {
+    return this._dv.getBigInt64(byteOffset, true);
+  }
+
+  /**
+   * Read a BigUint64 value out of this segment.
+   *
+   * @param {number} byteOffset The offset in bytes to the value.
+   * @returns {number} The value.
+   */
+
+  getBigUint64(byteOffset: number): bigint {
+    return this._dv.getBigUint64(byteOffset, true);
+  }
+
+  /**
    * Read a float32 value out of this segment.
    *
    * @param {number} byteOffset The offset in bytes to the value.
@@ -247,7 +269,7 @@ export class Segment implements DataView {
   }
 
   /**
-   * Read a uint8 value out of this segment.
+   * Read a uint64 value out of this segment.
    * NOTE: this does not copy the memory region, so updates to the underlying buffer will affect the Uint64 value!
    *
    * @param {number} byteOffset The offset in bytes to the value.
@@ -314,6 +336,30 @@ export class Segment implements DataView {
 
     this._dv = new DataView(buffer);
     this.buffer = buffer;
+  }
+
+  /**
+   * Write an int64 value to the specified offset.
+   *
+   * @param {number} byteOffset The offset from the beginning of the buffer.
+   * @param {number} val The value to store.
+   * @returns {void}
+   */
+
+  setBigInt64(byteOffset: number, val: bigint): void {
+    this._dv.setBigInt64(byteOffset, val, true);
+  }
+
+  /**
+   * Write a uint64 value to the specified offset.
+   *
+   * @param {number} byteOffset The offset from the beginning of the buffer.
+   * @param {number} val The value to store.
+   * @returns {void}
+   */
+
+  setBigUint64(byteOffset: number, val: bigint): void {
+    this._dv.setBigUint64(byteOffset, val, true);
   }
 
   /**

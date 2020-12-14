@@ -190,7 +190,6 @@
     "no-unsafe-any": true,
     "no-unsafe-finally": true,
     "no-unused-expression": [true, "allow-fast-null-checks"],
-    "no-use-before-declare": true,
     "no-var-keyword": true,
     "no-var-requires": true,
     "no-void-expression": [true, "ignore-arrow-function-shorthand"],

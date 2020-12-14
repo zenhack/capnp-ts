@@ -10,7 +10,7 @@ import {
   getUint16Mask,
   getUint32Mask,
   getUint64Mask,
-  getUint8Mask
+  getUint8Mask,
 } from "../../../lib/serialization/mask";
 import { Int64, Uint64 } from "../../../lib/types";
 import { compareBuffers, tap } from "../../util";
@@ -21,7 +21,7 @@ const BIT_MASKS = [
   { mask: [0b00000000], bitOffset: 5, val: false },
   { mask: [0b00100000], bitOffset: 5, val: true },
   { mask: [0b00000001], bitOffset: 0, val: true },
-  { mask: [0b00100000], bitOffset: 13, val: true }
+  { mask: [0b00100000], bitOffset: 13, val: true },
 ];
 
 const FLOAT_32_MASKS = [
@@ -30,7 +30,7 @@ const FLOAT_32_MASKS = [
   { mask: [0x00, 0x00, 0xc0, 0x7f], val: NaN },
   { mask: [0x00, 0x00, 0x80, 0x7f], val: Infinity },
   { mask: [0x00, 0x00, 0x80, 0xff], val: -Infinity },
-  { mask: [0x00, 0x00, 0x20, 0x41], val: 10 }
+  { mask: [0x00, 0x00, 0x20, 0x41], val: 10 },
 ];
 
 const FLOAT_64_MASKS = [
@@ -39,7 +39,7 @@ const FLOAT_64_MASKS = [
   { mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0x7f], val: NaN },
   { mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f], val: Infinity },
   { mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0xff], val: -Infinity },
-  { mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40], val: 10 }
+  { mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24, 0x40], val: 10 },
 ];
 
 const INT_16_MASKS = [
@@ -51,7 +51,7 @@ const INT_16_MASKS = [
   // Testing overflow behavior.
   { mask: [0xff, 0xff], val: 0xffff },
   { mask: [0x00, 0x80], val: 0x8000 },
-  { mask: [0x21, 0x22], val: 0xfffffffff + 0x2222 }
+  { mask: [0x21, 0x22], val: 0xfffffffff + 0x2222 },
 ];
 
 const INT_32_MASKS = [
@@ -63,30 +63,30 @@ const INT_32_MASKS = [
   // Testing overflow behavior.
   { mask: [0xff, 0xff, 0xff, 0xff], val: 0xffffffff },
   { mask: [0x00, 0x00, 0x00, 0x80], val: 0x80000000 },
-  { mask: [0x21, 0x22, 0x00, 0x00], val: 0xfffffffff + 0x2222 }
+  { mask: [0x21, 0x22, 0x00, 0x00], val: 0xfffffffff + 0x2222 },
 ];
 
 const INT_64_MASKS = [
   {
     mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-    val: 0x0000000000000000
+    val: 0x0000000000000000,
   },
   {
     mask: [0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x00],
-    val: 0x00123456789abcde
+    val: 0x00123456789abcde,
   },
   {
     mask: [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe0, 0xff],
-    val: MIN_SAFE_INTEGER
+    val: MIN_SAFE_INTEGER,
   },
   {
     mask: [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00],
-    val: MAX_SAFE_INTEGER
+    val: MAX_SAFE_INTEGER,
   },
   {
     mask: [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff],
-    val: -0x0000000000000001
-  }
+    val: -0x0000000000000001,
+  },
 ];
 
 const INT_8_MASKS = [
@@ -98,7 +98,7 @@ const INT_8_MASKS = [
   // Testing overflow behavior.
   { mask: [0xff], val: 0xff },
   { mask: [0x80], val: 0x80 },
-  { mask: [0x21], val: 0xfffffffff + 0x22 }
+  { mask: [0x21], val: 0xfffffffff + 0x22 },
 ];
 
 const UINT_16_MASKS = [
@@ -110,7 +110,7 @@ const UINT_16_MASKS = [
   // Testing overflow behavior.
   { mask: [0xff, 0xff], val: -0x0001 },
   { mask: [0x00, 0x80], val: -0x8000 },
-  { mask: [0x21, 0x22], val: 0xfffffffff + 0x2222 }
+  { mask: [0x21, 0x22], val: 0xfffffffff + 0x2222 },
 ];
 
 const UINT_32_MASKS = [
@@ -122,31 +122,31 @@ const UINT_32_MASKS = [
   // Testing overflow behavior.
   { mask: [0x00, 0x00, 0x00, 0x80], val: -0x80000000 },
   { mask: [0xff, 0xff, 0xff, 0xff], val: -0x00000001 },
-  { mask: [0x21, 0x22, 0x00, 0x00], val: 0xfffffffff + 0x00002222 }
+  { mask: [0x21, 0x22, 0x00, 0x00], val: 0xfffffffff + 0x00002222 },
 ];
 
 const UINT_64_MASKS = [
   {
     mask: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-    val: 0x0000000000000000
+    val: 0x0000000000000000,
   },
   {
     mask: [0xde, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x00],
-    val: 0x00123456789abcde
+    val: 0x00123456789abcde,
   },
   {
     mask: [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00],
-    val: MAX_SAFE_INTEGER
+    val: MAX_SAFE_INTEGER,
   },
   // Negative numbers are negated.
   {
     mask: [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x1f, 0x00],
-    val: MIN_SAFE_INTEGER
+    val: MIN_SAFE_INTEGER,
   },
   {
     mask: [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
-    val: -0x0000000000000001
-  }
+    val: -0x0000000000000001,
+  },
 ];
 
 const UINT_8_MASKS = [
@@ -158,7 +158,7 @@ const UINT_8_MASKS = [
   // Testing overflow behavior.
   { mask: [0x80], val: -0x80 },
   { mask: [0xff], val: -0x01 },
-  { mask: [0x21], val: 0xfffffffff + 0x2222 }
+  { mask: [0x21], val: 0xfffffffff + 0x2222 },
 ];
 
 function makeMaskTest(
@@ -166,16 +166,29 @@ function makeMaskTest(
   fn: (x: number) => DataView,
   testData: MaskArray
 ) {
-  tap.test(name, t => {
+  tap.test(name,t => {
     testData.forEach(({ mask, val }) => {
-      compareBuffers(t, fn(val).buffer, new Uint8Array(mask).buffer);
+      if (Number.isNaN(val)) {
+        // There are multiple valid bit encodings of NaN, and for some reason
+        // the value in the array is stored internalyl using a different
+        // representation than the value produced by using this constant
+        // directly, despite the fact that the array value is generated from
+        // this constant.
+        val = NaN;
+      }
+      compareBuffers(
+        t,
+        fn(val).buffer,
+        new Uint8Array(mask).buffer,
+        `encodes ${val.toString()}`
+      );
     });
 
     t.end();
   });
 }
 
-tap.test("getBitMask()", t => {
+tap.test("getBitMask()",t => {
   BIT_MASKS.forEach(({ bitOffset, mask, val }) => {
     compareBuffers(
       t,
@@ -187,7 +200,7 @@ tap.test("getBitMask()", t => {
   t.end();
 });
 
-tap.test("getInt64Mask()", t => {
+tap.test("getInt64Mask()",t => {
   INT_64_MASKS.forEach(({ mask, val }) => {
     compareBuffers(
       t,
@@ -199,7 +212,7 @@ tap.test("getInt64Mask()", t => {
   t.end();
 });
 
-tap.test("getUint64Mask()", t => {
+tap.test("getUint64Mask()",t => {
   UINT_64_MASKS.forEach(({ mask, val }) => {
     compareBuffers(
       t,
