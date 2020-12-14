@@ -9,9 +9,12 @@ import { newReturnMessage, setReturnException } from "./capability";
 import { Pointer } from "../serialization/pointers/pointer";
 import { transformPtr } from "./transform-ptr";
 import { Interface } from "../serialization/pointers/interface";
-import { RPC_NULL_CLIENT, RPC_UNIMPLEMENTED } from "../errors";
+import {
+  RPC_CALL_QUEUE_FULL,
+  RPC_NULL_CLIENT,
+  RPC_UNIMPLEMENTED,
+} from "../errors";
 import { QueueClient, callQueueSize } from "./queue-client";
-import { RPC_CALL_QUEUE_FULL } from "../../lib/errors";
 
 // An Answer is the deferred result of a client call, which is usually wrapped
 // by a Pipeline.
@@ -59,7 +62,7 @@ export class AnswerEntry<R extends Struct> {
 
     let firstErr: Error | undefined;
     try {
-      this.conn.makeCapTable(ret.segment, len => payload.initCapTable(len));
+      this.conn.makeCapTable(ret.segment, (len) => payload.initCapTable(len));
       this.conn.sendMessage(retmsg);
     } catch (err) {
       if (!firstErr) {
@@ -205,11 +208,11 @@ export class AnswerEntry<R extends Struct> {
 
     const qcall: QCallRemoteCall = {
       a,
-      call: copyCall(call)
+      call: copyCall(call),
     };
     const pcall: AnswerPCall = {
       qcall,
-      transform
+      transform,
     };
     this.queue.push(pcall);
   }

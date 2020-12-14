@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "../index";
-import { ObjectSize as __O, Struct as __S } from '../index';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from '../index';
 export const _capnpFileId = "86c366a91393f3f8";
 export class StreamResult extends __S {
     static readonly _capnp = { displayName: "StreamResult", id: "995f9a3377c0b16e", size: new __O(0, 0) };
