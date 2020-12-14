@@ -23,6 +23,7 @@ import { Pointer, StructCtor, PointerType, Struct } from "./pointers";
 import { Segment } from "./segment";
 import { getTargetStructSize, validate } from "./pointers/pointer";
 import { resize, initStruct } from "./pointers/struct";
+import { Client } from "../rpc/client";
 
 const trace = initTrace("capnp:message");
 trace("load");
@@ -31,6 +32,7 @@ export interface _Message {
   readonly arena: AnyArena;
   segments: Segment[];
   traversalLimit: number;
+  capTable?: Array<Client | null>;
 }
 
 export class Message {
@@ -176,6 +178,15 @@ export class Message {
 
   toString() {
     return `Message_arena:${this._capnp.arena}`;
+  }
+
+  addCap(client: Client | null): number {
+    if (!this._capnp.capTable) {
+      this._capnp.capTable = [];
+    }
+    const id = this._capnp.capTable.length;
+    this._capnp.capTable.push(client);
+    return id;
   }
 }
 

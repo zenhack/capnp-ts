@@ -9,14 +9,16 @@ import {
   createClassExtends,
   createConcreteListProperty,
   createConstProperty,
+  createExpressionBlock,
   createMethod,
   createNestedNodeProperty,
   createUnionConstProperty,
-  createValueExpression
+  createValueExpression,
 } from "./ast-creators";
 import { CodeGeneratorFileContext } from "./code-generator-file-context";
 import {
   __,
+  ASYNC,
   BOOLEAN_TYPE,
   CAPNP,
   ConcreteListType,
@@ -24,6 +26,7 @@ import {
   LENGTH,
   NUMBER_TYPE,
   Primitive,
+  QUESTION_TOKEN,
   READONLY,
   STATIC,
   STRING_TYPE,
@@ -32,7 +35,8 @@ import {
   TS_FILE_ID,
   VALUE,
   VOID_TYPE,
-  OBJECT_SIZE
+  ANY_TYPE,
+  OBJECT_SIZE,
 } from "./constants";
 import * as E from "./errors";
 import {
@@ -44,7 +48,7 @@ import {
   getUnnamedUnionFields,
   hasNode,
   lookupNode,
-  needsConcreteListClass
+  needsConcreteListClass,
 } from "./file";
 import * as util from "./util";
 import { lookup } from "dns";
@@ -58,17 +62,17 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
   const fileNode = lookupNode(ctx, ctx.file);
   const tsFileId = capnp.Uint64.fromHexString(TS_FILE_ID);
   // This may be undefined if ts.capnp is not imported; fine, we'll just use the default.
-  const tsAnnotationFile = ctx.nodes.find(n => n.getId().equals(tsFileId));
+  const tsAnnotationFile = ctx.nodes.find((n) => n.getId().equals(tsFileId));
   // We might not find the importPath annotation; that's definitely a bug but let's move on.
   const tsImportPathAnnotation =
     tsAnnotationFile &&
-    tsAnnotationFile.getNestedNodes().find(n => n.getName() === "importPath");
+    tsAnnotationFile.getNestedNodes().find((n) => n.getName() === "importPath");
   // There may not necessarily be an import path annotation on the file node. That's fine.
   const importAnnotation =
     tsImportPathAnnotation &&
     fileNode
       .getAnnotations()
-      .find(a => a.getId().equals(tsImportPathAnnotation.getId()));
+      .find((a) => a.getId().equals(tsImportPathAnnotation.getId()));
   const importPath =
     importAnnotation === undefined
       ? "capnp-ts"
@@ -90,18 +94,18 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
     )
   );
 
-  // import { ObjectSize as __O, Struct as __S } from '${importPath}';
+  // import { ObjectSize as __O, Struct as __S, Interface as __I } from '${importPath}';
   ctx.statements.push(
     ts.createStatement(
       ts.createIdentifier(
-        `import { ObjectSize as __O, Struct as __S } from '${importPath}'`
+        `import { ObjectSize as __O, Struct as __S, Interface as __I } from '${importPath}'`
       )
     )
   );
 }
 
 export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
-  ctx.imports.forEach(i => {
+  ctx.imports.forEach((i) => {
     const name = i.getName();
     let importPath: string;
 
@@ -113,9 +117,9 @@ export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
 
     const imports = lookupNode(ctx, i)
       .getNestedNodes()
-      .filter(n => hasNode(ctx, n))
-      .filter(n => lookupNode(ctx, n).isStruct())
-      .map(n => n.getName())
+      .filter((n) => hasNode(ctx, n))
+      .filter((n) => lookupNode(ctx, n).isStruct())
+      .map((n) => n.getName())
       .join(", ");
 
     if (imports.length < 1) return;
@@ -162,6 +166,7 @@ export function generateDefaultValue(
     case s.Type_Which.DATA:
     case s.Type_Which.LIST:
     case s.Type_Which.STRUCT:
+    case s.Type_Which.INTERFACE:
       initializer = createValueExpression(slot.getDefaultValue());
 
       break;
@@ -174,7 +179,7 @@ export function generateDefaultValue(
     case s.Type_Which.BOOL:
       initializer = ts.createCall(ts.createPropertyAccess(CAPNP, p.mask), __, [
         createValueExpression(slot.getDefaultValue()),
-        ts.createNumericLiteral((slot.getOffset() % 8).toString())
+        ts.createNumericLiteral((slot.getOffset() % 8).toString()),
       ]);
 
       break;
@@ -191,7 +196,7 @@ export function generateDefaultValue(
     case s.Type_Which.UINT64:
     case s.Type_Which.UINT8:
       initializer = ts.createCall(ts.createPropertyAccess(CAPNP, p.mask), __, [
-        createValueExpression(slot.getDefaultValue())
+        createValueExpression(slot.getDefaultValue()),
       ]);
 
       break;
@@ -216,7 +221,7 @@ export function generateEnumNode(
     .getEnumerants()
     .toArray()
     .sort(compareCodeOrder)
-    .map(e => ts.createEnumMember(util.c2s(e.getName())));
+    .map((e) => ts.createEnumMember(util.c2s(e.getName())));
   const d = ts.createEnumDeclaration(
     __,
     [EXPORT],
@@ -244,14 +249,516 @@ export function generateFileId(ctx: CodeGeneratorFileContext): void {
 }
 
 export function generateInterfaceClasses(
-  _ctx: CodeGeneratorFileContext,
+  ctx: CodeGeneratorFileContext,
   node: s.Node
 ): void {
-  trace("Interface generation is not yet implemented.");
+  trace("generateInterfaceClasses(%s) [%s]", node, node.getDisplayName());
 
-  /* tslint:disable-next-line */
-  console.error(
-    `CAPNP-TS: Warning! Interface generation (${node.getDisplayName()}) is not yet implemented.`
+  // Generate the parameter and result structs first
+  generateMethodStructs(ctx, node);
+
+  // Now generate the client & server classes
+  generateClient(ctx, node);
+  generateServer(ctx, node);
+}
+
+export function generateMethodStructs(
+  ctx: CodeGeneratorFileContext,
+  node: s.Node
+): void {
+  trace("generateMethodStructs(%s) [%s]", node, node.getDisplayName());
+
+  node
+    .getInterface()
+    .getMethods()
+    .forEach((method) => {
+      const paramNode = lookupNode(ctx, method.getParamStructType());
+      const resultNode = lookupNode(ctx, method.getResultStructType());
+
+      generateNode(ctx, paramNode);
+      generateNode(ctx, resultNode);
+      generateResultPromise(ctx, resultNode);
+    });
+}
+
+export function generateServer(
+  ctx: CodeGeneratorFileContext,
+  node: s.Node
+): void {
+  // TODO: handle superclasses
+  trace("generateServer(%s) [%s]", node, node.getDisplayName());
+
+  const fullClassName = getFullClassName(node);
+  const serverName = `${fullClassName}$Server`;
+  const serverTargetName = `${serverName}$Target`;
+  const clientName = `${fullClassName}$Client`;
+
+  // Generate the `Foobar$Server$Target` interface
+  {
+    const elements = node
+      .getInterface()
+      .getMethods()
+      .map<ts.TypeElement>((method) => {
+        const paramTypeName = getFullClassName(
+          lookupNode(ctx, method.getParamStructType())
+        );
+        const resultTypeName = getFullClassName(
+          lookupNode(ctx, method.getResultStructType())
+        );
+
+        return ts.createMethodSignature(
+          __, // typeParams
+          [
+            ts.createParameter(
+              __, // decorators
+              __, // modifiers
+              __, // dotDotToken
+              "params", // name
+              __, // questionToken
+              ts.createTypeReferenceNode(paramTypeName, __), // type,
+              __ // initializer
+            ),
+            ts.createParameter(
+              __, // decorators
+              __, // modifiers
+              __, // dotDotToken
+              "results", // name
+              __, // questionToken
+              ts.createTypeReferenceNode(resultTypeName, __), // type,
+              __ // initializer
+            ),
+          ], // params
+          ts.createTypeReferenceNode("Promise", [VOID_TYPE]), // type
+          method.getName(), // name
+          __ // questionToken
+        );
+      });
+
+    ctx.statements.push(
+      ts.createInterfaceDeclaration(
+        __, // decorators
+        [EXPORT], // modifiers
+        serverTargetName, // name
+        __, // typeParams
+        __, // heritageClauses
+        elements
+      )
+    );
+  }
+
+  const members: ts.ClassElement[] = [];
+
+  members.push(
+    ts.createProperty(
+      __, // decorators
+      [READONLY], // modifiers
+      "target", // name
+      __, // questionOrExclamationmark
+      ts.createTypeReferenceNode(serverTargetName, __), // type
+      __ // initializer
+    )
+  );
+
+  // Generate server constructor
+  {
+    const serverMethods: ts.Expression[] = [];
+    node
+      .getInterface()
+      .getMethods()
+      .forEach((method, index) => {
+        serverMethods.push(
+          ts.createObjectLiteral(
+            [
+              ts.createSpreadAssignment(
+                ts.createElementAccess(
+                  ts.createPropertyAccess(
+                    ts.createIdentifier(clientName),
+                    "methods"
+                  ),
+                  index
+                )
+              ),
+              ts.createPropertyAssignment(
+                "impl",
+                ts.createPropertyAccess(
+                  ts.createIdentifier("target"),
+                  method.getName()
+                )
+              ),
+            ],
+            true // multiline
+          )
+        );
+      });
+
+    members.push(
+      ts.createConstructor(
+        __, // decorators
+        __, // modifiers
+        [
+          ts.createParameter(
+            __, // decorators
+            __, // modifiers
+            __, // dotDotToken
+            "target", // name
+            __, // questionToken
+            ts.createTypeReferenceNode(serverTargetName, __), // type
+            __ // initializer
+          ),
+        ], // parameters
+        ts.createBlock(
+          [
+            ts.createExpressionStatement(
+              ts.createCall(
+                ts.createIdentifier("super"),
+                __, // typeArguments
+                [
+                  ts.createIdentifier("target"),
+                  ts.createArrayLiteral(serverMethods, true /* multiline */),
+                ] // arguments
+              )
+            ),
+            ts.createExpressionStatement(
+              ts.createAssignment(
+                ts.createPropertyAccess(THIS, "target"),
+                ts.createIdentifier("target")
+              )
+            ),
+          ],
+          true // multiline
+        ) // body
+      )
+    );
+  }
+
+  members.push(
+    ts.createMethod(
+      __, // decorators
+      __, // modifiers
+      __, // asteriskToken
+      "client", // name
+      __, // questionToken
+      __, // typeParams
+      [], // params
+      ts.createTypeReferenceNode(clientName, __), // type
+      ts.createBlock(
+        [
+          ts.createReturn(
+            ts.createNew(
+              ts.createIdentifier(clientName),
+              __, // typeArgs
+              [THIS] // args
+            )
+          ),
+        ],
+        false // multiline
+      )
+    )
+  );
+
+  ctx.statements.push(
+    ts.createClassDeclaration(
+      __, // decorators
+      [EXPORT], // modifiers
+      serverName, // name
+      __, // typeParams
+      [createClassExtends("capnp.Server")], // heritageClauses
+      members // members
+    )
+  );
+}
+
+export function generateClientMethod(
+  ctx: CodeGeneratorFileContext,
+  node: s.Node,
+  clientName: string,
+  members: ts.ClassElement[],
+  methodDefs: ts.Expression[],
+  methodDefTypes: ts.TypeNode[],
+  method: s.Method,
+  index: number
+): void {
+  trace(
+    "generateClientMethod(%s, %s, %d) [%s]",
+    node,
+    method,
+    index,
+    node.getDisplayName()
+  );
+
+  const name = method.getName();
+  const parameters: ts.ParameterDeclaration[] = [];
+
+  const paramTypeName = getFullClassName(
+    lookupNode(ctx, method.getParamStructType())
+  );
+  const resultTypeName = getFullClassName(
+    lookupNode(ctx, method.getResultStructType())
+  );
+
+  const methodDefName = `${name}$method`;
+
+  methodDefTypes.push(
+    ts.createTypeReferenceNode(
+      "capnp.Method",
+      [
+        ts.createTypeReferenceNode(paramTypeName, __),
+        ts.createTypeReferenceNode(resultTypeName, __),
+      ] // typeArgs
+    )
+  );
+  methodDefs.push(
+    ts.createObjectLiteral(
+      [
+        ts.createPropertyAssignment(
+          "ParamsClass",
+          ts.createIdentifier(paramTypeName)
+        ),
+        ts.createPropertyAssignment(
+          "ResultsClass",
+          ts.createIdentifier(resultTypeName)
+        ),
+        ts.createPropertyAssignment(
+          "interfaceId",
+          ts.createPropertyAccess(
+            ts.createIdentifier(clientName),
+            "interfaceId"
+          )
+        ),
+        ts.createPropertyAssignment(
+          "methodId",
+          ts.createNumericLiteral(index.toString())
+        ),
+        ts.createPropertyAssignment(
+          "interfaceName",
+          ts.createStringLiteral(node.getDisplayName())
+        ),
+        ts.createPropertyAssignment(
+          "methodName",
+          ts.createStringLiteral(method.getName())
+        ),
+      ],
+      true /* multiline */
+    )
+  );
+
+  members.push(
+    ts.createMethod(
+      __, // decorators
+      __, // modifiers
+      __, // asteriskToken
+      name,
+      __, // typeParameters
+      __, // questionToken
+      [
+        ts.createParameter(
+          __, // decorators
+          __, // modifiers
+          __, // dotDotToken
+          "paramsFunc",
+          QUESTION_TOKEN, // questionToken
+          ts.createFunctionTypeNode(
+            __, // typeParameters
+            [
+              ts.createParameter(
+                __, // decorators
+                __, // modifiers
+                __, // dotDotToken
+                "params", // name
+                __, // questionToken
+                ts.createTypeReferenceNode(paramTypeName, __) // type
+              ),
+            ],
+            VOID_TYPE // type
+          )
+        ),
+      ], // parameters
+      ts.createTypeReferenceNode(`${resultTypeName}$Promise`, __),
+      ts.createBlock(
+        [
+          ts.createVariableStatement(
+            __, // modifiers
+            ts.createVariableDeclarationList(
+              [
+                ts.createVariableDeclaration(
+                  "answer",
+                  __,
+                  ts.createCall(
+                    ts.createPropertyAccess(
+                      ts.createPropertyAccess(THIS, "client"),
+                      "call"
+                    ),
+                    __, // typeArgs
+                    [
+                      ts.createObjectLiteral(
+                        [
+                          ts.createPropertyAssignment(
+                            "method",
+                            ts.createElementAccess(
+                              ts.createPropertyAccess(
+                                ts.createIdentifier(clientName),
+                                "methods"
+                              ),
+                              index
+                            )
+                          ),
+                          ts.createPropertyAssignment(
+                            "paramsFunc",
+                            ts.createIdentifier("paramsFunc")
+                          ),
+                        ],
+                        true // multiline
+                      ),
+                    ]
+                  )
+                ),
+              ],
+              ts.NodeFlags.Const
+            )
+          ), // const answer = ...
+
+          ts.createVariableStatement(
+            __, // modifiers
+            ts.createVariableDeclarationList(
+              [
+                ts.createVariableDeclaration(
+                  "pipeline",
+                  __,
+                  ts.createNew(
+                    ts.createIdentifier("capnp.Pipeline"),
+                    __, // typeArgs
+                    [
+                      ts.createIdentifier(resultTypeName),
+                      ts.createIdentifier("answer"),
+                    ]
+                  )
+                ),
+              ],
+              ts.NodeFlags.Const
+            )
+          ), // const pipeline = ...
+
+          ts.createReturn(
+            ts.createNew(
+              ts.createIdentifier(`${resultTypeName}$Promise`),
+              __, // typeArguments
+              [ts.createIdentifier("pipeline")]
+            )
+          ),
+        ],
+        true // multiline
+      )
+    )
+  );
+}
+
+export function generateClient(
+  ctx: CodeGeneratorFileContext,
+  node: s.Node
+): void {
+  trace("generateClient(%s) [%s]", node, node.getDisplayName());
+
+  const fullClassName = getFullClassName(node);
+  const clientName = `${fullClassName}$Client`;
+
+  // TODO: handle superclasses
+  const members: ts.ClassElement[] = [];
+
+  const ClientType = ts.createTypeReferenceNode("capnp.Client", __);
+
+  members.push(ts.createProperty(__, __, "client", __, ClientType, __));
+
+  members.push(
+    ts.createProperty(
+      __,
+      [STATIC, READONLY],
+      "interfaceId",
+      __,
+      ts.createTypeReferenceNode("capnp.Uint64", __),
+      ts.createCall(
+        ts.createPropertyAccess(
+          ts.createIdentifier("capnp.Uint64"),
+          "fromHexString"
+        ),
+        __, // typeArgs
+        [ts.createStringLiteral(node.getId().toHexString())]
+      )
+    )
+  );
+
+  members.push(
+    ts.createConstructor(
+      __, // decorators
+      __, // modifiers
+      [ts.createParameter(__, __, __, "client", __, ClientType)], // parameters
+      ts.createBlock(
+        [
+          ts.createStatement(
+            ts.createAssignment(
+              ts.createPropertyAccess(THIS, "client"),
+              ts.createIdentifier("client")
+            )
+          ),
+        ],
+        true // multiline
+      ) // body
+    )
+  );
+
+  const methodDefs: ts.Expression[] = [];
+  const methodDefTypes: ts.TypeNode[] = [];
+
+  members.push(
+    ts.createProperty(
+      __, // decorators
+      [STATIC, READONLY], // modifiers
+      "methods", // name
+      __, // questionOrExclamationToken
+      ts.createTupleTypeNode(methodDefTypes), // type
+      ts.createArrayLiteral(
+        methodDefs,
+        true // multiline
+      ) // initializer
+    )
+  );
+
+  node
+    .getInterface()
+    .getMethods()
+    .forEach((method, index) => {
+      generateClientMethod(
+        ctx,
+        node,
+        clientName,
+        members,
+        methodDefs,
+        methodDefTypes,
+        method,
+        index
+      );
+    });
+
+  ctx.statements.push(
+    ts.createClassDeclaration(__, [EXPORT], clientName, __, [], members)
+  );
+
+  ctx.statements.push(
+    ts.createExpressionStatement(
+      ts.createCall(
+        ts.createPropertyAccess(
+          ts.createIdentifier("capnp.Registry"),
+          "register"
+        ),
+        __, // typeArgs
+        [
+          ts.createPropertyAccess(
+            ts.createIdentifier(clientName),
+            "interfaceId"
+          ),
+          ts.createIdentifier(clientName),
+        ]
+      )
+    )
   );
 }
 
@@ -270,7 +777,7 @@ export function generateNode(
 
   /** An array of group structs formed as children of this struct. They appear before the struct node in the file. */
   const groupNodes = ctx.nodes.filter(
-    n =>
+    (n) =>
       n.getScopeId().equals(nodeId) &&
       n.isStruct() &&
       n.getStruct().getIsGroup()
@@ -279,10 +786,10 @@ export function generateNode(
    * An array of nodes that are nested within this node; these must appear first since those symbols will be
    * refernced in the node's class definition.
    */
-  const nestedNodes = node.getNestedNodes().map(n => lookupNode(ctx, n));
+  const nestedNodes = node.getNestedNodes().map((n) => lookupNode(ctx, n));
 
-  nestedNodes.forEach(n => generateNode(ctx, n));
-  groupNodes.forEach(n => generateNode(ctx, n));
+  nestedNodes.forEach((n) => generateNode(ctx, n));
+  groupNodes.forEach((n) => generateNode(ctx, n));
 
   const whichNode = node.which();
 
@@ -318,6 +825,178 @@ export function generateNode(
   }
 }
 
+export function generateResultPromise(
+  ctx: CodeGeneratorFileContext,
+  node: s.Node
+) {
+  trace("generateResultsPromise(%s) [%s]", node, node.getDisplayName());
+
+  const nodeId = node.getId();
+  const nodeIdHex = nodeId.toHexString();
+
+  if (ctx.generatedResultsPromiseIds.indexOf(nodeIdHex) > -1) return;
+
+  ctx.generatedResultsPromiseIds.push(nodeIdHex);
+
+  const resultsClassName = getFullClassName(node);
+  const fullClassName = `${resultsClassName}$Promise`;
+
+  const PipelineType = ts.createTypeReferenceNode("capnp.Pipeline", [
+    ANY_TYPE,
+    ANY_TYPE,
+    ts.createTypeReferenceNode(resultsClassName, __),
+  ]);
+
+  const members: ts.ClassElement[] = [];
+  members.push(ts.createProperty(__, [], "pipeline", __, PipelineType, __));
+
+  members.push(
+    ts.createConstructor(
+      __, // decorators
+      __, // modifiers
+      [ts.createParameter(__, __, __, "pipeline", __, PipelineType)], // parameters
+      ts.createBlock(
+        [
+          ts.createStatement(
+            ts.createAssignment(
+              ts.createPropertyAccess(THIS, "pipeline"),
+              ts.createIdentifier("pipeline")
+            )
+          ),
+        ],
+        true // multiline
+      ) // body
+    )
+  );
+
+  const struct = node.getStruct();
+  const fields = struct.getFields().toArray().sort(compareCodeOrder);
+
+  const generatePromiseFieldMethod = (field: s.Field) => {
+    let jsType: string;
+    let isInterface = false;
+    let slot: s.Field_Slot;
+
+    if (field.isSlot()) {
+      slot = field.getSlot();
+      const slotType = slot.getType();
+      if (slotType.which() !== s.Type.INTERFACE) {
+        // TODO: return a Promise<jsType> for non-interface slots
+        return;
+      }
+      isInterface = true;
+      jsType = getJsType(ctx, slotType, false);
+    } else if (field.isGroup()) {
+      // TODO: how should groups be handled?
+      return;
+    } else {
+      throw new Error(format(E.GEN_UNKNOWN_STRUCT_FIELD, field.which()));
+    }
+
+    const promisedJsType = jsType;
+    if (isInterface) {
+      jsType = `${jsType}$Client`;
+    }
+
+    const name = field.getName();
+    const properName = util.c2t(name);
+    const jsTypeReference = ts.createTypeReferenceNode(jsType, __);
+
+    {
+      // const pipeline = this.pipeline.getPipeline(SlotType, offset)
+      const pipeline = ts.createCall(
+        ts.createPropertyAccess(
+          ts.createPropertyAccess(THIS, "pipeline"),
+          "getPipeline"
+        ),
+        __, // typeArguments
+        [
+          ts.createIdentifier(promisedJsType),
+          ts.createNumericLiteral(slot.getOffset().toString()),
+        ] // arguments
+      ); // call
+
+      // const client = pipeline.client()
+      const client = ts.createCall(
+        ts.createPropertyAccess(pipeline, ts.createIdentifier("client")),
+        __, // typeArguments
+        __ // arguments
+      );
+
+      // new RemoteInterface(client)
+      const remoteInterface = ts.createNew(
+        ts.createIdentifier(jsType), // expression
+        __, // typeArguments
+        [client] // argumentsArray
+      );
+
+      members.push(
+        ts.createMethod(
+          __, // decorators
+          __, // modifiers
+          __, // asteriskToken
+          `get${properName}`,
+          __,
+          __,
+          [], // parameters
+          jsTypeReference,
+          ts.createBlock(
+            [ts.createReturn(remoteInterface)],
+            true // multiLine
+          )
+        )
+      );
+    }
+  };
+
+  fields.forEach(generatePromiseFieldMethod);
+
+  {
+    members.push(
+      ts.createMethod(
+        __, // decorators
+        [ASYNC], // modifiers
+        __, // asteriskToken
+        `promise`,
+        __,
+        __,
+        [], // parameters
+        ts.createTypeReferenceNode(
+          "Promise",
+          [ts.createTypeReferenceNode(resultsClassName, __)] // typeArguments
+        ),
+        createExpressionBlock(
+          [
+            ts.createAwait(
+              ts.createCall(
+                ts.createPropertyAccess(
+                  ts.createPropertyAccess(THIS, "pipeline"),
+                  "struct"
+                ),
+                __, // typeArguments
+                __ // parameters
+              ) // call
+            ), // await
+          ],
+          true, // returns
+          false // allowSingleLine
+        )
+      )
+    );
+  }
+
+  const c = ts.createClassDeclaration(
+    __,
+    [EXPORT],
+    fullClassName,
+    __,
+    [], // TODO: inheritance
+    members
+  );
+
+  ctx.statements.push(c);
+}
+
 const listLengthParameterName = "length";
 
 export function generateStructFieldMethods(
@@ -339,8 +1018,16 @@ export function generateStructFieldMethods(
   } else {
     throw new Error(format(E.GEN_UNKNOWN_STRUCT_FIELD, field.which()));
   }
+  let jsTypeReference = ts.createTypeReferenceNode(jsType, __);
 
-  const jsTypeReference = ts.createTypeReferenceNode(jsType, __);
+  const isInterface = whichType === s.Type.INTERFACE;
+  const originalJsType = jsType;
+  const originalJsTypeReference = jsTypeReference;
+  if (isInterface) {
+    jsType = `${jsType}$Client`;
+    jsTypeReference = ts.createTypeReferenceNode(jsType, __);
+  }
+
   const discriminantOffset = node.getStruct().getDiscriminantOffset();
   const name = field.getName();
   const properName = util.c2t(name);
@@ -365,7 +1052,7 @@ export function generateStructFieldMethods(
   );
   /** capnp.Orphan<Foo> */
   const orphanType = ts.createTypeReferenceNode("capnp.Orphan", [
-    jsTypeReference
+    jsTypeReference,
   ]);
   const discriminantOffsetLiteral = ts.createNumericLiteral(
     (discriminantOffset * 2).toString()
@@ -415,7 +1102,7 @@ export function generateStructFieldMethods(
       /** __S.copyFrom(value, __S.getPointer(0, this)) */
       set = ts.createCall(ts.createPropertyAccess(STRUCT, "copyFrom"), __, [
         VALUE,
-        get
+        get,
       ]);
 
       break;
@@ -447,7 +1134,7 @@ export function generateStructFieldMethods(
       set = ts.createCall(ts.createPropertyAccess(STRUCT, setter), __, [
         byteOffset,
         VALUE,
-        THIS
+        THIS,
       ]);
 
       break;
@@ -470,26 +1157,50 @@ export function generateStructFieldMethods(
       init = ts.createCall(ts.createPropertyAccess(STRUCT, "initData"), __, [
         offsetLiteral,
         LENGTH,
-        THIS
+        THIS,
       ]);
       set = copyFromValue;
 
       break;
 
     case s.Type.INTERFACE:
-      if (hadExplicitDefault) {
-        throw new Error(
-          format(E.GEN_EXPLICIT_DEFAULT_NON_PRIMITIVE, "INTERFACE")
+      // new SomeInterface$Client(__S.getInterfaceClientOrNullAt(0, this));
+      {
+        const client = ts.createCall(
+          ts.createPropertyAccess(STRUCT, "getInterfaceClientOrNullAt"),
+          __, // typeParams
+          [offsetLiteral, THIS]
         );
+        const newClient = ts.createNew(
+          ts.createIdentifier(jsType),
+          __, // typeParams
+          [client]
+        );
+        get = newClient;
       }
 
-      /** __S.getPointerAs(0, Foo, this) */
-      get = ts.createCall(ts.createPropertyAccess(STRUCT, "getPointerAs"), __, [
-        offsetLiteral,
-        ts.createIdentifier(jsType),
-        THIS
-      ]);
-      set = copyFromValue;
+      {
+        const message = ts.createPropertyAccess(
+          ts.createPropertyAccess(THIS, ts.createIdentifier("segment")),
+          ts.createIdentifier("message")
+        );
+        const capId = ts.createCall(
+          ts.createPropertyAccess(message, "addCap"),
+          __, // typeParams
+          [ts.createPropertyAccess(ts.createIdentifier("value"), "client")]
+        );
+        const ptr = ts.createCall(
+          ts.createPropertyAccess(STRUCT, "getPointer"),
+          __, // typeParams
+          [offsetLiteral, THIS]
+        );
+
+        set = ts.createCall(
+          ts.createPropertyAccess(STRUCT, "setInterfacePointer"),
+          __, // typeParams
+          [capId, ptr]
+        );
+      }
 
       break;
 
@@ -534,7 +1245,7 @@ export function generateStructFieldMethods(
         offsetLiteral,
         listClassIdentifier,
         ts.createIdentifier(listLengthParameterName),
-        THIS
+        THIS,
       ]);
       set = copyFromValue;
 
@@ -583,7 +1294,7 @@ export function generateStructFieldMethods(
       set = ts.createCall(ts.createPropertyAccess(STRUCT, "setText"), __, [
         offsetLiteral,
         VALUE,
-        THIS
+        THIS,
       ]);
 
       break;
@@ -601,7 +1312,7 @@ export function generateStructFieldMethods(
       /** __S.getAs(Foo, this); */
       get = ts.createCall(ts.createPropertyAccess(STRUCT, "getAs"), __, [
         groupType,
-        THIS
+        THIS,
       ]);
       init = get;
 
@@ -613,16 +1324,16 @@ export function generateStructFieldMethods(
       break;
   }
 
-  // adoptFoo(value: capnp.Orphan<Foo>): void { __S.adopt(value, this._getPointer(3)); }}
+  // adoptFoo(value: capnp.Orphan<Foo>): void { __S.adopt(value, this._getPointer(3)); }
   if (adopt) {
     const parameters = [
-      ts.createParameter(__, __, __, VALUE, __, orphanType, __)
+      ts.createParameter(__, __, __, VALUE, __, orphanType, __),
     ];
     const expressions = [
       ts.createCall(ts.createPropertyAccess(STRUCT, "adopt"), __, [
         VALUE,
-        getPointer
-      ])
+        getPointer,
+      ]),
     ];
 
     if (union) expressions.unshift(setDiscriminant);
@@ -640,7 +1351,7 @@ export function generateStructFieldMethods(
       []
     );
     const expressions = [
-      ts.createCall(ts.createPropertyAccess(STRUCT, "disown"), __, [getter])
+      ts.createCall(ts.createPropertyAccess(STRUCT, "disown"), __, [getter]),
     ];
 
     members.push(
@@ -658,7 +1369,7 @@ export function generateStructFieldMethods(
           ts.createLiteral(name),
           getDiscriminant,
           discriminantValueLiteral,
-          THIS
+          THIS,
         ])
       );
     }
@@ -674,9 +1385,9 @@ export function generateStructFieldMethods(
     const expressions = [
       ts.createLogicalNot(
         ts.createCall(ts.createPropertyAccess(STRUCT, "isNull"), __, [
-          getPointer
+          getPointer,
         ])
-      )
+      ),
     ];
 
     members.push(
@@ -697,7 +1408,7 @@ export function generateStructFieldMethods(
               __,
               NUMBER_TYPE,
               __
-            )
+            ),
           ]
         : [];
     const expressions = [init];
@@ -723,7 +1434,7 @@ export function generateStructFieldMethods(
     );
     const right = discriminantValueLiteral;
     const expressions = [
-      ts.createBinary(left, ts.SyntaxKind.EqualsEqualsEqualsToken, right)
+      ts.createBinary(left, ts.SyntaxKind.EqualsEqualsEqualsToken, right),
     ];
 
     members.push(
@@ -765,8 +1476,8 @@ export function generateStructNode(
   const fullClassName = getFullClassName(node);
   const nestedNodes = node
     .getNestedNodes()
-    .map(n => lookupNode(ctx, n))
-    .filter(n => !n.isConst() && !n.isAnnotation());
+    .map((n) => lookupNode(ctx, n))
+    .filter((n) => !n.isConst() && !n.isAnnotation());
   const nodeId = node.getId();
   const nodeIdHex = nodeId.toHexString();
   const struct = node.which() === s.Node.STRUCT ? node.getStruct() : undefined;
@@ -777,10 +1488,7 @@ export function generateStructNode(
   const discriminantCount = struct ? struct.getDiscriminantCount() : 0;
   const discriminantOffset = struct ? struct.getDiscriminantOffset() : 0;
   const fields = struct
-    ? struct
-        .getFields()
-        .toArray()
-        .sort(compareCodeOrder)
+    ? struct.getFields().toArray().sort(compareCodeOrder)
     : [];
   const pointerCount = struct ? struct.getPointerCount() : 0;
 
@@ -788,7 +1496,7 @@ export function generateStructNode(
     .filter(needsConcreteListClass)
     .sort(compareCodeOrder);
   const consts = ctx.nodes.filter(
-    n => n.getScopeId().equals(nodeId) && n.isConst()
+    (n) => n.getScopeId().equals(nodeId) && n.isConst()
   );
   // const groups = ctx.nodes.filter(
   //   (n) => n.getScopeId().equals(nodeId) && n.isStruct() && n.getStruct().getIsGroup());
@@ -805,31 +1513,42 @@ export function generateStructNode(
 
   // static readonly WHICH = MyStruct_Which.WHICH;
   members.push(
-    ...unionFields.map(f => createUnionConstProperty(fullClassName, f))
+    ...unionFields.map((f) => createUnionConstProperty(fullClassName, f))
   );
 
   // static readonly NestedStruct = MyStruct_NestedStruct;
   members.push(...nestedNodes.map(createNestedNodeProperty));
 
-  // static readonly Client = MyInterface_Client;
-  // static readonly Server = MyInterface_Server;
-  // if (interfaceNode) {
-
-  //   members.push(
-  //     ts.createProperty(__, [STATIC, READONLY], 'Client', __, __, ts.createLiteral(`${fullClassName}_Client`)));
-  //   members.push(
-  //     ts.createProperty(__, [STATIC, READONLY], 'Server', __, __, ts.createLiteral(`${fullClassName}_Server`)));
-
-  // }
+  // static readonly Client = MyInterface$Client;
+  // static readonly Server = MyInterface$Server;
+  if (interfaceNode) {
+    members.push(
+      ts.createProperty(
+        __,
+        [STATIC, READONLY],
+        "Client",
+        __,
+        __,
+        ts.createIdentifier(`${fullClassName}$Client`)
+      )
+    );
+    members.push(
+      ts.createProperty(
+        __,
+        [STATIC, READONLY],
+        "Server",
+        __,
+        __,
+        ts.createIdentifier(`${fullClassName}$Server`)
+      )
+    );
+  }
 
   const defaultValues = fields.reduce(
     (acc, f) =>
       f.isSlot() &&
       f.getSlot().getHadExplicitDefault() &&
-      f
-        .getSlot()
-        .getType()
-        .which() !== s.Type.VOID
+      f.getSlot().getType().which() !== s.Type.VOID
         ? acc.concat(generateDefaultValue(node, f))
         : acc,
     [] as ts.PropertyAssignment[]
@@ -854,19 +1573,19 @@ export function generateStructNode(
             "size",
             ts.createNew(OBJECT_SIZE, __, [
               ts.createNumericLiteral(dataByteLength.toString()),
-              ts.createNumericLiteral(pointerCount.toString())
+              ts.createNumericLiteral(pointerCount.toString()),
             ])
-          )
+          ),
         ].concat(defaultValues)
       )
     )
   );
 
   // private static _ConcreteListClass: MyStruct_ConcreteListClass;
-  members.push(...concreteLists.map(f => createConcreteListProperty(ctx, f)));
+  members.push(...concreteLists.map((f) => createConcreteListProperty(ctx, f)));
 
   // getFoo() { ... } initFoo() { ... } setFoo() { ... }
-  fields.forEach(f => generateStructFieldMethods(ctx, members, node, f));
+  fields.forEach((f) => generateStructFieldMethods(ctx, members, node, f));
 
   // toString(): string { return 'MyStruct_' + super.toString(); }
   const toStringExpression = ts.createBinary(
@@ -901,7 +1620,7 @@ export function generateStructNode(
     [EXPORT],
     fullClassName,
     __,
-    [createClassExtends("__S")],
+    [interfaceNode ? createClassExtends("__I") : createClassExtends("__S")],
     members
   );
 
@@ -918,7 +1637,7 @@ export function generateStructNode(
   // FIXME: This might be solvable with topological sorting?
 
   ctx.concreteLists.push(
-    ...concreteLists.map<[string, s.Field]>(f => [fullClassName, f])
+    ...concreteLists.map<[string, s.Field]>((f) => [fullClassName, f])
   );
 }
 
@@ -929,7 +1648,7 @@ export function generateUnnamedUnionEnum(
 ): void {
   const members = unionFields
     .sort(compareCodeOrder)
-    .map(f =>
+    .map((f) =>
       ts.createEnumMember(
         util.c2s(f.getName()),
         ts.createNumericLiteral(f.getDiscriminantValue().toString())

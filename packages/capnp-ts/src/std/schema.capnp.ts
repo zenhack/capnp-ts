@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "../index";
-import { ObjectSize as __O, Struct as __S } from '../index';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from '../index';
 export const _capnpFileId = "a93fc509624c72d9";
 export class Node_Parameter extends __S {
     static readonly _capnp = { displayName: "Parameter", id: "b9521bccf10fa3b1", size: new __O(0, 1) };
@@ -20,6 +20,28 @@ export class Node_NestedNode extends __S {
     getId(): capnp.Uint64 { return __S.getUint64(0, this); }
     setId(value: capnp.Uint64): void { __S.setUint64(0, value, this); }
     toString(): string { return "Node_NestedNode_" + super.toString(); }
+}
+export class Node_SourceInfo_Member extends __S {
+    static readonly _capnp = { displayName: "Member", id: "c2ba9038898e1fa2", size: new __O(0, 1) };
+    getDocComment(): string { return __S.getText(0, this); }
+    setDocComment(value: string): void { __S.setText(0, value, this); }
+    toString(): string { return "Node_SourceInfo_Member_" + super.toString(); }
+}
+export class Node_SourceInfo extends __S {
+    static readonly Member = Node_SourceInfo_Member;
+    static readonly _capnp = { displayName: "SourceInfo", id: "f38e1de3041357ae", size: new __O(8, 2) };
+    static _Members: capnp.ListCtor<Node_SourceInfo_Member>;
+    getId(): capnp.Uint64 { return __S.getUint64(0, this); }
+    setId(value: capnp.Uint64): void { __S.setUint64(0, value, this); }
+    getDocComment(): string { return __S.getText(0, this); }
+    setDocComment(value: string): void { __S.setText(0, value, this); }
+    adoptMembers(value: capnp.Orphan<capnp.List<Node_SourceInfo_Member>>): void { __S.adopt(value, __S.getPointer(1, this)); }
+    disownMembers(): capnp.Orphan<capnp.List<Node_SourceInfo_Member>> { return __S.disown(this.getMembers()); }
+    getMembers(): capnp.List<Node_SourceInfo_Member> { return __S.getList(1, Node_SourceInfo._Members, this); }
+    hasMembers(): boolean { return !__S.isNull(__S.getPointer(1, this)); }
+    initMembers(length: number): capnp.List<Node_SourceInfo_Member> { return __S.initList(1, Node_SourceInfo._Members, length, this); }
+    setMembers(value: capnp.List<Node_SourceInfo_Member>): void { __S.copyFrom(value, __S.getPointer(1, this)); }
+    toString(): string { return "Node_SourceInfo_" + super.toString(); }
 }
 export class Node_Struct extends __S {
     static readonly _capnp = { displayName: "struct", id: "9ea0b19b37fb4435", size: new __O(40, 6) };
@@ -140,6 +162,7 @@ export class Node extends __S {
     static readonly ANNOTATION = Node_Which.ANNOTATION;
     static readonly Parameter = Node_Parameter;
     static readonly NestedNode = Node_NestedNode;
+    static readonly SourceInfo = Node_SourceInfo;
     static readonly _capnp = { displayName: "Node", id: "e682ab4cf923a417", size: new __O(40, 6) };
     static _Parameters: capnp.ListCtor<Node_Parameter>;
     static _NestedNodes: capnp.ListCtor<Node_NestedNode>;
@@ -1010,8 +1033,9 @@ export class CodeGeneratorRequest_RequestedFile extends __S {
 }
 export class CodeGeneratorRequest extends __S {
     static readonly RequestedFile = CodeGeneratorRequest_RequestedFile;
-    static readonly _capnp = { displayName: "CodeGeneratorRequest", id: "bfc546f6210ad7ce", size: new __O(0, 3) };
+    static readonly _capnp = { displayName: "CodeGeneratorRequest", id: "bfc546f6210ad7ce", size: new __O(0, 4) };
     static _Nodes: capnp.ListCtor<Node>;
+    static _SourceInfo: capnp.ListCtor<Node_SourceInfo>;
     static _RequestedFiles: capnp.ListCtor<CodeGeneratorRequest_RequestedFile>;
     adoptCapnpVersion(value: capnp.Orphan<CapnpVersion>): void { __S.adopt(value, __S.getPointer(2, this)); }
     disownCapnpVersion(): capnp.Orphan<CapnpVersion> { return __S.disown(this.getCapnpVersion()); }
@@ -1025,6 +1049,12 @@ export class CodeGeneratorRequest extends __S {
     hasNodes(): boolean { return !__S.isNull(__S.getPointer(0, this)); }
     initNodes(length: number): capnp.List<Node> { return __S.initList(0, CodeGeneratorRequest._Nodes, length, this); }
     setNodes(value: capnp.List<Node>): void { __S.copyFrom(value, __S.getPointer(0, this)); }
+    adoptSourceInfo(value: capnp.Orphan<capnp.List<Node_SourceInfo>>): void { __S.adopt(value, __S.getPointer(3, this)); }
+    disownSourceInfo(): capnp.Orphan<capnp.List<Node_SourceInfo>> { return __S.disown(this.getSourceInfo()); }
+    getSourceInfo(): capnp.List<Node_SourceInfo> { return __S.getList(3, CodeGeneratorRequest._SourceInfo, this); }
+    hasSourceInfo(): boolean { return !__S.isNull(__S.getPointer(3, this)); }
+    initSourceInfo(length: number): capnp.List<Node_SourceInfo> { return __S.initList(3, CodeGeneratorRequest._SourceInfo, length, this); }
+    setSourceInfo(value: capnp.List<Node_SourceInfo>): void { __S.copyFrom(value, __S.getPointer(3, this)); }
     adoptRequestedFiles(value: capnp.Orphan<capnp.List<CodeGeneratorRequest_RequestedFile>>): void { __S.adopt(value, __S.getPointer(1, this)); }
     disownRequestedFiles(): capnp.Orphan<capnp.List<CodeGeneratorRequest_RequestedFile>> { return __S.disown(this.getRequestedFiles()); }
     getRequestedFiles(): capnp.List<CodeGeneratorRequest_RequestedFile> { return __S.getList(1, CodeGeneratorRequest._RequestedFiles, this); }
@@ -1033,6 +1063,7 @@ export class CodeGeneratorRequest extends __S {
     setRequestedFiles(value: capnp.List<CodeGeneratorRequest_RequestedFile>): void { __S.copyFrom(value, __S.getPointer(1, this)); }
     toString(): string { return "CodeGeneratorRequest_" + super.toString(); }
 }
+Node_SourceInfo._Members = capnp.CompositeList(Node_SourceInfo_Member);
 Node_Struct._Fields = capnp.CompositeList(Field);
 Node_Enum._Enumerants = capnp.CompositeList(Enumerant);
 Node_Interface._Methods = capnp.CompositeList(Method);
@@ -1048,4 +1079,5 @@ Brand_Scope._Bind = capnp.CompositeList(Brand_Binding);
 Brand._Scopes = capnp.CompositeList(Brand_Scope);
 CodeGeneratorRequest_RequestedFile._Imports = capnp.CompositeList(CodeGeneratorRequest_RequestedFile_Import);
 CodeGeneratorRequest._Nodes = capnp.CompositeList(Node);
+CodeGeneratorRequest._SourceInfo = capnp.CompositeList(Node_SourceInfo);
 CodeGeneratorRequest._RequestedFiles = capnp.CompositeList(CodeGeneratorRequest_RequestedFile);

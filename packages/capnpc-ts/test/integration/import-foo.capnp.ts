@@ -5,7 +5,7 @@
  */
 
 import * as capnp from "capnp-ts";
-import { ObjectSize as __O, Struct as __S } from 'capnp-ts';
+import { ObjectSize as __O, Struct as __S, Interface as __I } from 'capnp-ts';
 import { Baz } from "./import-bar.capnp";
 export const _capnpFileId = "fc552bdafbb0b889";
 export class Foo extends __S {

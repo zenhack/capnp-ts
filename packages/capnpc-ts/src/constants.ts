@@ -55,13 +55,14 @@ export const LENGTH = ts.createIdentifier("length");
 
 /** Some data used to help generate code for primitive struct fields. */
 
-interface PrimitiveDescription {
-  byteLength: number;
-  getter: string;
-  mask: string;
-  setter: string;
-}
-export const Primitive: { [key: number]: PrimitiveDescription } = {
+export const Primitive: {
+  [key: number]: {
+    byteLength: number;
+    getter: string;
+    mask: string;
+    setter: string;
+  };
+} = {
   [s.Type.BOOL]: {
     byteLength: 1,
     getter: "getBit",
@@ -162,6 +163,14 @@ export const SOURCE_COMMENT = `/* tslint:disable */
 
 export const STATIC = ts.createToken(ts.SyntaxKind.StaticKeyword);
 
+/** async */
+
+export const ASYNC = ts.createToken(ts.SyntaxKind.AsyncKeyword);
+
+/** ? */
+
+export const QUESTION_TOKEN = ts.createToken(ts.SyntaxKind.QuestionToken);
+
 /** string */
 
 export const STRING_TYPE = ts.createTypeReferenceNode("string", __);
@@ -189,3 +198,7 @@ export const VALUE = ts.createIdentifier("value");
 /** void */
 
 export const VOID_TYPE = ts.createTypeReferenceNode("void", __);
+
+/** any */
+
+export const ANY_TYPE = ts.createTypeReferenceNode("any", __);
