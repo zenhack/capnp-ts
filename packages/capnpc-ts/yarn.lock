@@ -240,7 +240,7 @@ camelcase@^4.1.0:
 
 capnp-ts@^0.1.0:
   version "0.1.0"
-  resolved "https://registry.yarnpkg.com/capnp-ts/-/capnp-ts-0.1.0.tgz#7e1346856d0d09ac247a126a2ea64625d17944cd"
+  resolved "file:../capnp-ts"
   dependencies:
     debug "^2.6.3"
     format "^0.2.2"
