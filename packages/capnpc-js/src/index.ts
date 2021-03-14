@@ -39,8 +39,7 @@ export async function main() {
     .then(ctx => {
       transpileAll(ctx);
     })
-    .thenReturn()
-    .tapCatch(reason => {
+    .catch(reason => {
       // tslint:disable-next-line:no-console
       console.error(reason);
       process.exit(1);

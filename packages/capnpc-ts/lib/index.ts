@@ -15,13 +15,13 @@ import * as E from "./errors";
 export let errors = E;
 
 export async function main(): Promise<void> {
-  return run()
-    .thenReturn()
-    .tapCatch(reason => {
-      // tslint:disable-next-line:no-console
-      console.error(reason);
-      process.exit(1);
-    });
+  try {
+    await run()
+  } catch(reason) {
+    // tslint:disable-next-line:no-console
+    console.error(reason);
+    process.exit(1);
+  }
 }
 
 export async function run(): Promise<CodeGeneratorContext> {
