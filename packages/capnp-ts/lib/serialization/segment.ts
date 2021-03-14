@@ -213,6 +213,10 @@ export class Segment implements DataView {
     );
   }
 
+  getBigInt64(byteOffset: number): bigint {
+    return this._dv.getBigInt64(byteOffset, true);
+  }
+
   /**
    * Read an int8 value out of this segment.
    *
@@ -258,6 +262,10 @@ export class Segment implements DataView {
     return new Uint64(
       new Uint8Array(this.buffer.slice(byteOffset, byteOffset + 8))
     );
+  }
+
+  getBigUint64(byteOffset: number): bigint {
+    return this._dv.getBigUint64(byteOffset, true);
   }
 
   /**
@@ -395,6 +403,10 @@ export class Segment implements DataView {
     this._dv.setUint8(byteOffset + 7, val.buffer[7]);
   }
 
+  setBigInt64(byteOffset: number, val: bigint): void {
+    this._dv.setBigInt64(byteOffset, val, true);
+  }
+
   /**
    * Write a uint16 value to the specified offset.
    *
@@ -437,6 +449,10 @@ export class Segment implements DataView {
     this._dv.setUint8(byteOffset + 5, val.buffer[5]);
     this._dv.setUint8(byteOffset + 6, val.buffer[6]);
     this._dv.setUint8(byteOffset + 7, val.buffer[7]);
+  }
+
+  setBigUint64(byteOffset: number, val: bigint): void {
+    this._dv.setBigUint64(byteOffset, val, true);
   }
 
   /**
