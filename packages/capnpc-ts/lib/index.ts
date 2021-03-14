@@ -39,7 +39,7 @@ export async function run(): Promise<CodeGeneratorContext> {
 
       resolve();
     });
-  }
+  });
   const reqBuffer = new Buffer(
     chunks.reduce((l, chunk) => l + chunk.byteLength, 0)
   );
