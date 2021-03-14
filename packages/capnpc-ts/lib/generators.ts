@@ -413,7 +413,7 @@ export function generateServer(
         ], // parameters
         ts.createBlock(
           [
-            ts.createExpressionStatement(
+            ts.createStatement(
               ts.createCall(
                 ts.createIdentifier("super"),
                 __, // typeArguments
@@ -423,7 +423,7 @@ export function generateServer(
                 ] // arguments
               )
             ),
-            ts.createExpressionStatement(
+            ts.createStatement(
               ts.createAssignment(
                 ts.createPropertyAccess(THIS, "target"),
                 ts.createIdentifier("target")
@@ -748,7 +748,7 @@ export function generateClient(
   );
 
   ctx.statements.push(
-    ts.createExpressionStatement(
+    ts.createStatement(
       ts.createCall(
         ts.createPropertyAccess(
           ts.createIdentifier("capnp.Registry"),
