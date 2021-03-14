@@ -1,4 +1,3 @@
-import * as Bluebird from "bluebird";
 import * as capnp from "capnp-ts";
 import * as s from "capnp-ts/lib/std/schema.capnp";
 
@@ -25,50 +24,47 @@ export async function main(): Promise<void> {
     });
 }
 
-export async function run(): Bluebird<CodeGeneratorContext> {
-  return Bluebird.try(() => {
-    const chunks: Buffer[] = [];
+export async function run(): Promise<CodeGeneratorContext> {
+  const chunks: Buffer[] = [];
 
-    process.stdin.on("data", (chunk: Buffer) => {
-      trace("reading data chunk (%d bytes)", chunk.byteLength);
+  process.stdin.on("data", (chunk: Buffer) => {
+    trace("reading data chunk (%d bytes)", chunk.byteLength);
 
-      chunks.push(chunk);
-    });
-
-    return new Bluebird<void>(resolve => {
-      process.stdin.on("end", () => {
-        trace("read complete");
-
-        resolve();
-      });
-    }).then(() => {
-      const reqBuffer = new Buffer(
-        chunks.reduce((l, chunk) => l + chunk.byteLength, 0)
-      );
-
-      let i = 0;
-
-      chunks.forEach(chunk => {
-        chunk.copy(reqBuffer, i);
-
-        i += chunk.byteLength;
-      });
-
-      trace("reqBuffer (length: %d)", reqBuffer.length, reqBuffer);
-
-      const message = new capnp.Message(reqBuffer, false);
-
-      trace("message: %s", message.dump());
-
-      const req = message.getRoot(s.CodeGeneratorRequest);
-
-      trace("%s", req);
-
-      const ctx = loadRequest(req);
-
-      writeTsFiles(ctx);
-
-      return ctx;
-    });
+    chunks.push(chunk);
   });
+
+  await new Promise<void>((resolve, _reject) => {
+    process.stdin.on("end", () => {
+      trace("read complete");
+
+      resolve();
+    });
+  }
+  const reqBuffer = new Buffer(
+    chunks.reduce((l, chunk) => l + chunk.byteLength, 0)
+  );
+
+  let i = 0;
+
+  chunks.forEach(chunk => {
+    chunk.copy(reqBuffer, i);
+
+    i += chunk.byteLength;
+  });
+
+  trace("reqBuffer (length: %d)", reqBuffer.length, reqBuffer);
+
+  const message = new capnp.Message(reqBuffer, false);
+
+  trace("message: %s", message.dump());
+
+  const req = message.getRoot(s.CodeGeneratorRequest);
+
+  trace("%s", req);
+
+  const ctx = loadRequest(req);
+
+  writeTsFiles(ctx);
+
+  return ctx;
 }
