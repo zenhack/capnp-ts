@@ -39,8 +39,7 @@ export async function main(): Promise<void> {
     .then((ctx) => {
       transpileAll(ctx);
     })
-    .thenReturn()
-    .tapCatch((reason) => {
+    .catch(reason => {
       // tslint:disable-next-line:no-console
       console.error(reason);
       process.exit(1);
@@ -69,7 +68,10 @@ export function transpileAll(ctx: capnpc_ts.CodeGeneratorContext): void {
       const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
 
       if (diagnostic.file && diagnostic.start) {
-        const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        const {
+          line,
+          character,
+        } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
 
         /* tslint:disable-next-line:no-console */
         console.log(`${diagnostic.file.fileName}:${line + 1}:${character + 1} ${message}`);
