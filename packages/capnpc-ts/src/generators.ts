@@ -60,17 +60,17 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
   const fileNode = lookupNode(ctx, ctx.file);
   const tsFileId = capnp.Uint64.fromHexString(TS_FILE_ID);
   // This may be undefined if ts.capnp is not imported; fine, we'll just use the default.
-  const tsAnnotationFile = ctx.nodes.find((n) => n.getId().equals(tsFileId));
+  const tsAnnotationFile = ctx.nodes.find(n => n.getId().equals(tsFileId));
   // We might not find the importPath annotation; that's definitely a bug but let's move on.
   const tsImportPathAnnotation =
     tsAnnotationFile &&
-    tsAnnotationFile.getNestedNodes().find((n) => n.getName() === "importPath");
+    tsAnnotationFile.getNestedNodes().find(n => n.getName() === "importPath");
   // There may not necessarily be an import path annotation on the file node. That's fine.
   const importAnnotation =
     tsImportPathAnnotation &&
     fileNode
       .getAnnotations()
-      .find((a) => a.getId().equals(tsImportPathAnnotation.getId()));
+      .find(a => a.getId().equals(tsImportPathAnnotation.getId()));
   const importPath =
     importAnnotation === undefined
       ? "capnp-ts"
@@ -100,7 +100,7 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
 }
 
 export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
-  ctx.imports.forEach((i) => {
+  ctx.imports.forEach(i => {
     const name = i.getName();
     let importPath: string;
 
@@ -112,9 +112,9 @@ export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
 
     const imports = lookupNode(ctx, i)
       .getNestedNodes()
-      .filter((n) => hasNode(ctx, n))
-      .filter((n) => lookupNode(ctx, n).isStruct())
-      .map((n) => n.getName())
+      .filter(n => hasNode(ctx, n))
+      .filter(n => lookupNode(ctx, n).isStruct())
+      .map(n => n.getName())
       .join(", ");
 
     if (imports.length < 1) return;
@@ -199,7 +199,7 @@ export function generateEnumNode(ctx: CodeGeneratorFileContext, node: s.Node): v
     .getEnumerants()
     .toArray()
     .sort(compareCodeOrder)
-    .map((e) => ts.createEnumMember(util.c2s(e.getName())));
+    .map(e => ts.createEnumMember(util.c2s(e.getName())));
   const d = ts.createEnumDeclaration(
     __,
     [EXPORT],
@@ -246,7 +246,7 @@ export function generateMethodStructs(
   node
     .getInterface()
     .getMethods()
-    .forEach((method) => {
+    .forEach(method => {
       const paramNode = lookupNode(ctx, method.getParamStructType());
       const resultNode = lookupNode(ctx, method.getResultStructType());
 
@@ -273,7 +273,7 @@ export function generateServer(
     const elements = node
       .getInterface()
       .getMethods()
-      .map<ts.TypeElement>((method) => {
+      .map<ts.TypeElement>(method => {
         const paramTypeName = getFullClassName(
           lookupNode(ctx, method.getParamStructType())
         );
@@ -737,19 +737,47 @@ export function generateClient(
   );
 }
 
-export function generateNode(ctx: CodeGeneratorFileContext, node: s.Node): void {
+function scopeRoot(ctx: CodeGeneratorFileContext, node: s.Node): s.Node {
+  // Return the root of the node's lexical scope, i.e. follow the scope
+  // chain up until we reach a node with no parent scope, and return it.
+  while(!node.getScopeId().isZero()) {
+    node = lookupNode(ctx, node.getScopeId());
+  }
+  return node;
+}
+
+export function nodeInFileScope(ctx: CodeGeneratorFileContext, node: s.Node): boolean {
+  // Returns true if and only if `node` is within the lexical scope of `ctx.file`.
+  const root = scopeRoot(ctx, node);
+  return root.getId().equals(ctx.file.getId());
+}
+
+export function nodeIsAnonymous(ctx: CodeGeneratorFileContext, node: s.Node): boolean {
+  return scopeRoot(ctx, node).which() !== s.Node.FILE;
+}
+
+export function generateNode(
+  ctx: CodeGeneratorFileContext,
+  node: s.Node
+): void {
   trace("generateNode(%s, %s)", ctx, node.getId().toHexString());
 
   const nodeId = node.getId();
   const nodeIdHex = nodeId.toHexString();
 
-  if (ctx.generatedNodeIds.indexOf(nodeIdHex) > -1) return;
+  if (ctx.generatedNodeIds.indexOf(nodeIdHex) > -1) {
+    // Already generated; skip.
+    return
+  }
+  if(!nodeInFileScope(ctx, node) && !nodeIsAnonymous(ctx, node)) {
+    // belongs to some other file; skip.
+    return
+  }
 
   ctx.generatedNodeIds.push(nodeIdHex);
 
   /** An array of group structs formed as children of this struct. They appear before the struct node in the file. */
-  const groupNodes = ctx.nodes.filter(
-    (n) =>
+  const groupNodes = ctx.nodes.filter(n =>
       n.getScopeId().equals(nodeId) &&
       n.isStruct() &&
       n.getStruct().getIsGroup()
@@ -758,10 +786,10 @@ export function generateNode(ctx: CodeGeneratorFileContext, node: s.Node): void 
    * An array of nodes that are nested within this node; these must appear first since those symbols will be
    * refernced in the node's class definition.
    */
-  const nestedNodes = node.getNestedNodes().map((n) => lookupNode(ctx, n));
+  const nestedNodes = node.getNestedNodes().map(n => lookupNode(ctx, n));
 
-  nestedNodes.forEach((n) => generateNode(ctx, n));
-  groupNodes.forEach((n) => generateNode(ctx, n));
+  nestedNodes.forEach(n => generateNode(ctx, n));
+  groupNodes.forEach(n => generateNode(ctx, n));
 
   const whichNode = node.which();
 
@@ -1374,8 +1402,8 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   const fullClassName = getFullClassName(node);
   const nestedNodes = node
     .getNestedNodes()
-    .map((n) => lookupNode(ctx, n))
-    .filter((n) => !n.isConst() && !n.isAnnotation());
+    .map(n => lookupNode(ctx, n))
+    .filter(n => !n.isConst() && !n.isAnnotation());
   const nodeId = node.getId();
   const nodeIdHex = nodeId.toHexString();
   const struct = node.which() === s.Node.STRUCT ? node.getStruct() : undefined;
@@ -1393,8 +1421,7 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   const concreteLists = fields
     .filter(needsConcreteListClass)
     .sort(compareCodeOrder);
-  const consts = ctx.nodes.filter(
-    (n) => n.getScopeId().equals(nodeId) && n.isConst()
+  const consts = ctx.nodes.filter(n => n.getScopeId().equals(nodeId) && n.isConst()
   );
   // const groups = ctx.nodes.filter(
   //   (n) => n.getScopeId().equals(nodeId) && n.isStruct() && n.getStruct().getIsGroup());
@@ -1411,7 +1438,7 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
 
   // static readonly WHICH = MyStruct_Which.WHICH;
   members.push(
-    ...unionFields.map((f) => createUnionConstProperty(fullClassName, f))
+    ...unionFields.map(f => createUnionConstProperty(fullClassName, f))
   );
 
   // static readonly NestedStruct = MyStruct_NestedStruct;
@@ -1477,10 +1504,10 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   );
 
   // private static _ConcreteListClass: MyStruct_ConcreteListClass;
-  members.push(...concreteLists.map((f) => createConcreteListProperty(ctx, f)));
+  members.push(...concreteLists.map(f => createConcreteListProperty(ctx, f)));
 
   // getFoo() { ... } initFoo() { ... } setFoo() { ... }
-  fields.forEach((f) => generateStructFieldMethods(ctx, members, node, f));
+  fields.forEach(f => generateStructFieldMethods(ctx, members, node, f));
 
   // toString(): string { return 'MyStruct_' + super.toString(); }
   const toStringExpression = ts.createBinary(
@@ -1523,7 +1550,7 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
   // FIXME: This might be solvable with topological sorting?
 
   ctx.concreteLists.push(
-    ...concreteLists.map<[string, s.Field]>((f) => [fullClassName, f])
+    ...concreteLists.map<[string, s.Field]>(f => [fullClassName, f])
   );
 }
 
@@ -1534,7 +1561,7 @@ export function generateUnnamedUnionEnum(
 ): void {
   const members = unionFields
     .sort(compareCodeOrder)
-    .map((f) =>
+    .map(f =>
       ts.createEnumMember(
         util.c2s(f.getName()),
         ts.createNumericLiteral(f.getDiscriminantValue().toString())

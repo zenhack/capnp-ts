@@ -599,6 +599,17 @@ interface TestImplicitMethodParamsInGeneric(V) {
   call @0 [T, U] (foo :T, bar :U) -> TestGenerics(T, U);
 }
 
+interface TestExplicitStructParamResult {
+  call @0 ExplicitStructParam -> ExplicitStructResult;
+}
+struct ExplicitStructParam {}
+struct ExplicitStructResult {}
+
+using Imported = import "test-imported.capnp";
+interface TestImportedStructParamResult {
+  call @0 Imported.Param -> Imported.Result;
+}
+
 struct TestGenericsUnion(Foo, Bar) {
   # At one point this failed to compile.
 

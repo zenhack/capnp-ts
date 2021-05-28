@@ -6,6 +6,7 @@
 
 import * as capnp from "capnp-ts";
 import { ObjectSize as __O, Struct as __S, Interface as __I } from 'capnp-ts';
+import { Param, Result } from "./test-imported.capnp";
 export const _capnpFileId = "d508eebdc2dc42b8";
 export enum TestEnum {
     FOO,
@@ -2207,6 +2208,132 @@ export class TestImplicitMethodParamsInGeneric extends __I {
     static readonly Server = TestImplicitMethodParamsInGeneric$Server;
     static readonly _capnp = { displayName: "TestImplicitMethodParamsInGeneric", id: "df9ccdeb81a704c9", size: new __O(0, 0) };
     toString(): string { return "TestImplicitMethodParamsInGeneric_" + super.toString(); }
+}
+export class ExplicitStructParam extends __S {
+    static readonly _capnp = { displayName: "ExplicitStructParam", id: "aaa7d68faa498cd4", size: new __O(0, 0) };
+    toString(): string { return "ExplicitStructParam_" + super.toString(); }
+}
+export class ExplicitStructResult extends __S {
+    static readonly _capnp = { displayName: "ExplicitStructResult", id: "9175301043a3a340", size: new __O(0, 0) };
+    toString(): string { return "ExplicitStructResult_" + super.toString(); }
+}
+export class ExplicitStructResult$Promise {
+    pipeline: capnp.Pipeline<any, any, ExplicitStructResult>;
+    constructor(pipeline: capnp.Pipeline<any, any, ExplicitStructResult>) {
+        this.pipeline = pipeline;
+    }
+    async promise(): Promise<ExplicitStructResult> {
+        return await this.pipeline.struct();
+    }
+}
+export class TestExplicitStructParamResult$Client {
+    client: capnp.Client;
+    static readonly interfaceId: capnp.Uint64 = capnp.Uint64.fromHexString("980ae68ebeac8d21");
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
+    static readonly methods: [
+        capnp.Method<ExplicitStructParam, ExplicitStructResult>
+    ] = [
+        {
+            ParamsClass: ExplicitStructParam,
+            ResultsClass: ExplicitStructResult,
+            interfaceId: TestExplicitStructParamResult$Client.interfaceId,
+            methodId: 0,
+            interfaceName: "packages/capnpc-ts/test/integration/test.capnp:TestExplicitStructParamResult",
+            methodName: "call"
+        }
+    ];
+    call(paramsFunc?: (params: ExplicitStructParam) => void): ExplicitStructResult$Promise {
+        const answer = this.client.call({
+            method: TestExplicitStructParamResult$Client.methods[0],
+            paramsFunc: paramsFunc
+        });
+        const pipeline = new capnp.Pipeline(ExplicitStructResult, answer);
+        return new ExplicitStructResult$Promise(pipeline);
+    }
+}
+capnp.Registry.register(TestExplicitStructParamResult$Client.interfaceId, TestExplicitStructParamResult$Client);
+export interface TestExplicitStructParamResult$Server$Target {
+    call(params: ExplicitStructParam, results: ExplicitStructResult): Promise<void>;
+}
+export class TestExplicitStructParamResult$Server extends capnp.Server {
+    readonly target: TestExplicitStructParamResult$Server$Target;
+    constructor(target: TestExplicitStructParamResult$Server$Target) {
+        super(target, [
+            {
+                ...TestExplicitStructParamResult$Client.methods[0],
+                impl: target.call
+            }
+        ]);
+        this.target = target;
+    }
+    client(): TestExplicitStructParamResult$Client { return new TestExplicitStructParamResult$Client(this); }
+}
+export class TestExplicitStructParamResult extends __I {
+    static readonly Client = TestExplicitStructParamResult$Client;
+    static readonly Server = TestExplicitStructParamResult$Server;
+    static readonly _capnp = { displayName: "TestExplicitStructParamResult", id: "980ae68ebeac8d21", size: new __O(0, 0) };
+    toString(): string { return "TestExplicitStructParamResult_" + super.toString(); }
+}
+export class Result$Promise {
+    pipeline: capnp.Pipeline<any, any, Result>;
+    constructor(pipeline: capnp.Pipeline<any, any, Result>) {
+        this.pipeline = pipeline;
+    }
+    async promise(): Promise<Result> {
+        return await this.pipeline.struct();
+    }
+}
+export class TestImportedStructParamResult$Client {
+    client: capnp.Client;
+    static readonly interfaceId: capnp.Uint64 = capnp.Uint64.fromHexString("a746b00613d5aef7");
+    constructor(client: capnp.Client) {
+        this.client = client;
+    }
+    static readonly methods: [
+        capnp.Method<Param, Result>
+    ] = [
+        {
+            ParamsClass: Param,
+            ResultsClass: Result,
+            interfaceId: TestImportedStructParamResult$Client.interfaceId,
+            methodId: 0,
+            interfaceName: "packages/capnpc-ts/test/integration/test.capnp:TestImportedStructParamResult",
+            methodName: "call"
+        }
+    ];
+    call(paramsFunc?: (params: Param) => void): Result$Promise {
+        const answer = this.client.call({
+            method: TestImportedStructParamResult$Client.methods[0],
+            paramsFunc: paramsFunc
+        });
+        const pipeline = new capnp.Pipeline(Result, answer);
+        return new Result$Promise(pipeline);
+    }
+}
+capnp.Registry.register(TestImportedStructParamResult$Client.interfaceId, TestImportedStructParamResult$Client);
+export interface TestImportedStructParamResult$Server$Target {
+    call(params: Param, results: Result): Promise<void>;
+}
+export class TestImportedStructParamResult$Server extends capnp.Server {
+    readonly target: TestImportedStructParamResult$Server$Target;
+    constructor(target: TestImportedStructParamResult$Server$Target) {
+        super(target, [
+            {
+                ...TestImportedStructParamResult$Client.methods[0],
+                impl: target.call
+            }
+        ]);
+        this.target = target;
+    }
+    client(): TestImportedStructParamResult$Client { return new TestImportedStructParamResult$Client(this); }
+}
+export class TestImportedStructParamResult extends __I {
+    static readonly Client = TestImportedStructParamResult$Client;
+    static readonly Server = TestImportedStructParamResult$Server;
+    static readonly _capnp = { displayName: "TestImportedStructParamResult", id: "a746b00613d5aef7", size: new __O(0, 0) };
+    toString(): string { return "TestImportedStructParamResult_" + super.toString(); }
 }
 export enum TestGenericsUnion_Which {
     FOO = 0,
