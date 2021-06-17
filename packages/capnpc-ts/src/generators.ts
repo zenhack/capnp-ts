@@ -112,9 +112,22 @@ export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
 
     const imports = lookupNode(ctx, i)
       .getNestedNodes()
-      .filter(n => hasNode(ctx, n))
-      .filter(n => lookupNode(ctx, n).isStruct())
-      .map(n => n.getName())
+      .filter(n => {
+        if(!hasNode(ctx, n)) {
+          return false;
+        }
+        const node = lookupNode(ctx, n.getId());
+        return node.isStruct() || node.isInterface();
+      })
+      .map(n => {
+        const name = n.getName();
+        const node = lookupNode(ctx, n.getId());
+        if(node.isInterface()) {
+          return [name, name + "$Client"].join(", ");
+        } else {
+          return name;
+        }
+      })
       .join(", ");
 
     if (imports.length < 1) return;
