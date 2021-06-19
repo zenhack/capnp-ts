@@ -1487,7 +1487,7 @@ export function generateStructNode(ctx: CodeGeneratorFileContext, node: s.Node, 
       f.isSlot() &&
       f.getSlot().getHadExplicitDefault() &&
       f.getSlot().getType().which() !== s.Type.VOID
-        ? acc.concat(generateDefaultValue(node, f))
+        ? acc.concat(generateDefaultValue(f))
         : acc,
     [] as ts.PropertyAssignment[]
   );
