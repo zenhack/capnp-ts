@@ -1157,10 +1157,6 @@ export function generateStructFieldMethods(
       break;
 
     case s.Type.INTERFACE:
-      if (hadExplicitDefault) {
-        throw new Error(format(E.GEN_EXPLICIT_DEFAULT_NON_PRIMITIVE, "INTERFACE"));
-      }
-
       // new SomeInterface$Client(__S.getInterfaceClientOrNullAt(0, this));
       {
         const client = ts.createCall(
