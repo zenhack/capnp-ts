@@ -99,6 +99,24 @@ export function generateCapnpImport(ctx: CodeGeneratorFileContext): void {
   );
 }
 
+function emitNodeNames(ctx: CodeGeneratorFileContext, nn: s.Node_NestedNode, emit: (name: string) => void): void {
+  if(!hasNode(ctx, nn.getId())) {
+    return;
+  }
+  const node = lookupNode(ctx, nn.getId());
+  if(node.isStruct() || node.isInterface()) {
+    emit(nn.getName());
+  }
+  if(node.isInterface()) {
+    emit(nn.getName() + "$Client");
+  }
+  node.getNestedNodes().map(n => {
+    emitNodeNames(ctx, n, (name) => {
+      emit(nn.getName() + "_" + name);
+    })
+  });
+}
+
 export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
   ctx.imports.forEach(i => {
     const name = i.getName();
@@ -110,29 +128,16 @@ export function generateNestedImports(ctx: CodeGeneratorFileContext): void {
       importPath = name[0] === "." ? name : `./${name}`;
     }
 
-    const imports = lookupNode(ctx, i)
-      .getNestedNodes()
-      .filter(n => {
-        if(!hasNode(ctx, n)) {
-          return false;
-        }
-        const node = lookupNode(ctx, n.getId());
-        return node.isStruct() || node.isInterface();
-      })
-      .map(n => {
-        const name = n.getName();
-        const node = lookupNode(ctx, n.getId());
-        if(node.isInterface()) {
-          return [name, name + "$Client"].join(", ");
-        } else {
-          return name;
-        }
-      })
-      .join(", ");
+    const imports: string[] = [];
+    lookupNode(ctx, i).getNestedNodes().map(n => {
+      emitNodeNames(ctx, n, (name) => {
+        imports.push(name);
+      });
+    });
 
     if (imports.length < 1) return;
 
-    const importStatement = `import { ${imports} } from "${importPath}"`;
+    const importStatement = `import { ${imports.join(", ")} } from "${importPath}"`;
 
     trace("emitting import statement:", importStatement);
     ctx.statements.push(ts.createStatement(ts.createIdentifier(importStatement)));

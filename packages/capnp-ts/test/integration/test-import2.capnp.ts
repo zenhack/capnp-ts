@@ -6,7 +6,7 @@
 
 import * as capnp from "capnp-ts";
 import { ObjectSize as __O, Struct as __S, Interface as __I } from 'capnp-ts';
-import { Node, Field, Enumerant, Superclass, Method, Type, Brand, Value, Annotation } from "capnp-ts/lib/std/schema.capnp";
+import { Node, Node_Parameter, Node_NestedNode, Field, Enumerant, Superclass, Method, Type, Brand, Brand_Scope, Brand_Binding, Value, Annotation } from "capnp-ts/lib/std/schema.capnp";
 import { TestImport } from "./test-import.capnp";
 import { TestAllTypes } from "./test.capnp";
 export const _capnpFileId = "c64a3bf0338a124a";
