@@ -35,6 +35,9 @@ package-lock.json
 # Optional npm cache directory
 .npm
 
+# Typescript build info caches
+*.tsbuildinfo
+
 # Optional eslint cache
 .eslintcache
 
