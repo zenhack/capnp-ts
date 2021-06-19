@@ -136,7 +136,7 @@ export function lookupNode(ctx: CodeGeneratorFileContext, lookup: { getId(): cap
   const id = lookup instanceof capnp.Uint64 ? lookup : lookup.getId();
   const node = ctx.nodes.find((n) => n.getId().equals(id));
 
-  if (node === undefined) throw new Error(format(E.GEN_NODE_LOOKUP_FAIL, id));
+  if (node === undefined) throw new Error(format(E.GEN_NODE_LOOKUP_FAIL, "@0x" + id.toHexString()));
 
   return node;
 }
